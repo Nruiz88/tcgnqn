@@ -27,9 +27,9 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 
 | Módulo | Default | Activación | Comportamiento |
 |---|---|---|---|
-| `payments.transferencia` | ON | siempre | Checkout muestra alias/CBU + instrucciones |
-| `payments.whatsapp` | ON* | si `NEXT_PUBLIC_WHATSAPP` existe | Botón wa.me con resumen carrito/producto |
-| `payments.mercadopago` | OFF | credenciales MP | Preferencia de pago |
+| `payments.transferencia` | ON | siempre | Checkout muestra alias/CBU + instrucciones | ✅ implementado |
+| `payments.whatsapp` | ON* | si `NEXT_PUBLIC_WHATSAPP` existe | Botón wa.me con resumen carrito/producto | ✅ implementado |
+| `payments.mercadopago` | OFF | credenciales MP | Preferencia de pago | 🔲 placeholder |
 
 ### Módulos de envío
 

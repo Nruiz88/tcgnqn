@@ -17,6 +17,8 @@ Guía de verificación para la página de inicio.
 - [ ] Sección "Novedades"
 - [ ] Página "Ver todo" con paginación
 - [x] Campo de cupón en checkout (módulo coupons)
+- [x] Selección de método de pago en checkout (transferencia / WhatsApp / MP)
+- [x] Instrucciones de transferencia según método (alias/CVU)
 
 ## Funcionalidad
 
