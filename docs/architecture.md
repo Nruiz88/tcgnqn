@@ -35,7 +35,7 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 
 | Módulo | Default | Activación | Comportamiento |
 |---|---|---|---|
-| `shipping.correo_argentino` | OFF | credenciales API | Cotización en checkout, guía desde admin, tracking |
+| `shipping.correo_argentino` | OFF | credenciales API | Cotización en checkout, guía desde admin, tracking | 🔲 contrato listo |
 
 ### Módulos de negocio
 
