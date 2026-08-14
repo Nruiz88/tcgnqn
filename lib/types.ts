@@ -33,6 +33,7 @@ export type Order = {
   id: string
   user_id: string
   total: number
+  discount: number
   status: OrderStatus
   shipping_name: string
   shipping_phone: string
@@ -53,4 +54,16 @@ export type OrderItem = {
 export type CartItem = {
   product: Product
   quantity: number
+}
+
+export type Coupon = {
+  id: string
+  code: string
+  type: 'percent' | 'fixed'
+  value: number
+  min_total: number | null
+  max_uses: number | null
+  used_count: number
+  expires_at: string | null
+  active: boolean
 }

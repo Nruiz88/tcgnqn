@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isEnabled } from '@/lib/modules'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,6 +42,14 @@ export default async function AdminLayout({
         >
           Categorías
         </a>
+        {isEnabled('coupons') && (
+          <a
+            href="/admin/coupons"
+            className="text-sm font-medium hover:text-neutral-600"
+          >
+            Cupones
+          </a>
+        )}
       </nav>
       <div className="mt-6">{children}</div>
     </div>

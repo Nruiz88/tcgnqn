@@ -41,9 +41,9 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 
 | Módulo | Default | Activación | Comportamiento |
 |---|---|---|---|
-| `wishlist` | ON | siempre (usa auth) | Favoritos por usuario, corazón en tarjetas, página dedicada |
-| `coupons` | OFF | env var | Códigos %/fijo, fechas, límite de uso; se aplican en checkout |
-| `orders_notifications` | ON* | si `NEXT_PUBLIC_WHATSAPP` o email config | Aviso al cliente y admin al crear pedido |
+| `wishlist` | ON | siempre (usa auth) | Favoritos por usuario, corazón en tarjetas, página dedicada | ✅ implementado |
+| `coupons` | OFF | env var | Códigos %/fijo, fechas, límite de uso; se aplican en checkout | ✅ implementado |
+| `orders_notifications` | ON* | si `NEXT_PUBLIC_WHATSAPP` o email config | Aviso al cliente y admin al crear pedido | ✅ implementado (WhatsApp) |
 
 ### Placeholders futuros (patrón a replicar)
 

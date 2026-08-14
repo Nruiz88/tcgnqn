@@ -1,6 +1,6 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
-import type { Category, Order, OrderItem, Product } from '@/lib/types'
+import type { Category, Coupon, Order, OrderItem, Product } from '@/lib/types'
 
 export async function getAllProducts(): Promise<Product[]> {
   const supabase = await createClient()
@@ -71,7 +71,33 @@ export async function getProduct(id: string): Promise<Product | null> {
   return data as Product
 }
 
+export async function getCoupons(): Promise<Coupon[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Coupon[]
+}
+
 export type OrderWithItems = Order & { items: OrderItem[] }
+
+export async function getWishlist(): Promise<Product[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data, error } = await supabase
+    .from('wishlist_items')
+    .select('product(*, categories(*))')
+    .eq('user_id', user.id)
+  if (error) throw new Error(error.message)
+  const items = (data ?? []) as unknown as { product: Product | null }[]
+  return items.map((w) => w.product).filter((p): p is Product => !!p)
+}
 
 export async function getMyOrders(): Promise<OrderWithItems[]> {
   const supabase = await createClient()

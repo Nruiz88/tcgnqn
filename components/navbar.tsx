@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useCart } from '@/lib/cart-context'
 import { usePathname } from 'next/navigation'
+import { isEnabled } from '@/lib/modules'
 
 export default function Navbar() {
   const { count } = useCart()
@@ -51,6 +52,18 @@ export default function Navbar() {
           >
             Tienda
           </Link>
+          {isEnabled('wishlist') && (
+            <Link
+              href="/favoritos"
+              className={`text-sm font-medium ${
+                pathname === '/favoritos'
+                  ? 'text-neutral-900'
+                  : 'text-neutral-500 hover:text-neutral-900'
+              }`}
+            >
+              Favoritos
+            </Link>
+          )}
           <Link
             href="/cart"
             className={`relative text-sm font-medium ${

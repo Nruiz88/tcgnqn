@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useCart } from '@/lib/cart-context'
 import { createOrder } from '@/lib/actions'
 import { formatPrice } from '@/lib/format'
+import { isEnabled } from '@/lib/modules'
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCart()
@@ -78,6 +79,18 @@ export default function CheckoutPage() {
               className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
             />
           </div>
+          {isEnabled('coupons') && (
+            <div>
+              <label className="text-sm font-medium">
+                Cupón de descuento (opcional)
+              </label>
+              <input
+                name="coupon"
+                placeholder="BIENVENIDA10"
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm uppercase"
+              />
+            </div>
+          )}
 
           {error && (
             <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">

@@ -3,6 +3,8 @@ import { formatPrice } from '@/lib/format'
 import { updateOrderStatus } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
 import type { OrderStatus } from '@/lib/types'
+import { isEnabled } from '@/lib/modules'
+import { whatsappNumber } from '@/lib/whatsapp'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,8 +15,17 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   cancelled: 'Cancelado',
 }
 
+const STATUS_COLORS: Record<OrderStatus, string> = {
+  pending: 'bg-amber-100 text-amber-700',
+  confirmed: 'bg-blue-100 text-blue-700',
+  shipped: 'bg-green-100 text-green-700',
+  cancelled: 'bg-red-100 text-red-700',
+}
+
 export default async function AdminOrdersPage() {
   const orders = await getAllOrders()
+  const waEnabled = isEnabled('orders_notifications')
+  const storeNumber = whatsappNumber()
 
   return (
     <div>
@@ -40,6 +51,16 @@ export default async function AdminOrdersPage() {
                 {order.notes && (
                   <p className="mt-1 text-xs text-neutral-500">
                     Notas: {order.notes}
+                  </p>
+                )}
+                <span
+                  className={`mt-2 inline-block rounded px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[order.status]}`}
+                >
+                  {STATUS_LABELS[order.status]}
+                </span>
+                {order.discount > 0 && (
+                  <p className="mt-1 text-xs text-green-700">
+                    Descuento aplicado: {formatPrice(order.discount)}
                   </p>
                 )}
               </div>
@@ -68,6 +89,16 @@ export default async function AdminOrdersPage() {
                     ))}
                   </select>
                 </form>
+                {waEnabled && order.shipping_phone && storeNumber && (
+                  <a
+                    href={`https://wa.me/${order.shipping_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${order.shipping_name}! Tu pedido en TCG NQN está ${STATUS_LABELS[order.status].toLowerCase()}.`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-block rounded-md border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50"
+                  >
+                    WhatsApp al cliente
+                  </a>
+                )}
               </div>
             </div>
             <ul className="mt-3 space-y-1 text-sm text-neutral-600">

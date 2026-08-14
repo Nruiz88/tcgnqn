@@ -12,11 +12,11 @@ Guía de verificación para la página de inicio.
 - [x] Navbar sticky + footer
 - [x] Barra de búsqueda en navbar (base: search, desktop + mobile)
 - [x] Filtrado real por categoría (tabla categories + query param `?cat=`)
-- [ ] Corazón de wishlist en tarjetas (módulo wishlist)
+- [x] Corazón de wishlist en tarjetas (módulo wishlist)
 - [ ] Badge de stock bajo / agotado en tarjetas
 - [ ] Sección "Novedades"
 - [ ] Página "Ver todo" con paginación
-- [ ] Banner de cupón aplicable (módulo coupons)
+- [x] Campo de cupón en checkout (módulo coupons)
 
 ## Funcionalidad
 

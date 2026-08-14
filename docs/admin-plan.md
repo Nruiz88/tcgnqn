@@ -13,11 +13,14 @@ Guía de verificación para el panel de administración.
 - [x] Lista de pedidos: nombre/tel/dirección, fecha, notas, total, items, selector de estado
 - [x] CRUD de categorías (asignar al crear/editar producto)
 - [ ] Dashboard con KPIs (productos activos, stock bajo, pedidos pendientes)
+- [x] Gestión de cupones (CRUD admin + Pausar/Activar)
 - [ ] Búsqueda y filtros en lista de productos
 - [ ] Paginación de listas
 - [ ] Upload de imagen a Supabase Storage (hoy solo URL)
 - [ ] Detalle de pedido + badges de color por estado
-- [ ] Botón WhatsApp para contactar al cliente del pedido
+- [x] Botón WhatsApp para contactar al cliente del pedido
+- [x] Badge de color por estado de pedido
+- [x] Descuento de cupón visible en pedido
 - [ ] Confirmación en acciones destructivas
 - [ ] Vista responsive del panel
 
