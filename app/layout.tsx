@@ -24,9 +24,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
         <CartProvider>
-          <div className="min-h-full flex flex-col">
+          <div className="flex min-h-screen flex-col">
             <Navbar />
             <main className="flex-1">{children}</main>
+            <footer className="border-t border-neutral-200 bg-white">
+              <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">🃏</span>
+                  <span className="text-sm font-semibold">TCG NQN</span>
+                </div>
+                <p className="text-xs text-neutral-500">
+                  Cartas y accesorios coleccionables · Pagos coordinados por WhatsApp
+                </p>
+              </div>
+            </footer>
           </div>
         </CartProvider>
       </body>
