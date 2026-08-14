@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getCategories } from '@/lib/data'
 import ProductForm from '@/components/product-form'
 
 export const dynamic = 'force-dynamic'
@@ -11,11 +12,10 @@ export default async function EditProductPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: product } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const [categories, { data: product }] = await Promise.all([
+    getCategories(),
+    supabase.from('products').select('*').eq('id', id).single(),
+  ])
   if (!product) notFound()
 
   return (
@@ -24,6 +24,7 @@ export default async function EditProductPage({
       <div className="mt-4">
         <ProductForm
           action="update"
+          categories={categories.map((c) => ({ id: c.id, name: c.name }))}
           initial={{
             id: product.id,
             name: product.name,
@@ -31,6 +32,7 @@ export default async function EditProductPage({
             price: Number(product.price),
             stock: product.stock,
             image_url: product.image_url,
+            category_id: product.category_id,
           }}
         />
       </div>

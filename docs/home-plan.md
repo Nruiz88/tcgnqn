@@ -1,0 +1,34 @@
+# Plan — Home (base)
+
+Guía de verificación para la página de inicio.
+
+## Interfaz
+
+- [x] Hero oscuro con gradiente, badge, CTAs (Ver productos / Crear cuenta)
+- [x] Features (4 sellos de confianza)
+- [x] Categorías (4 tarjetas con emoji)
+- [x] Productos destacados (grid, hasta 8)
+- [x] CTA final "¿No encontrás lo que buscás?"
+- [x] Navbar sticky + footer
+- [x] Barra de búsqueda en navbar (base: search, desktop + mobile)
+- [x] Filtrado real por categoría (tabla categories + query param `?cat=`)
+- [ ] Corazón de wishlist en tarjetas (módulo wishlist)
+- [ ] Badge de stock bajo / agotado en tarjetas
+- [ ] Sección "Novedades"
+- [ ] Página "Ver todo" con paginación
+- [ ] Banner de cupón aplicable (módulo coupons)
+
+## Funcionalidad
+
+- [x] `getProducts()` filtra solo productos activos
+- [x] `ProductCard` (imagen o placeholder, precio ARS)
+- [x] Anclas de navegación (`#productos`)
+- [x] Búsqueda funcional por nombre/descripción (`searchProducts` con pg_trgm)
+- [x] Filtro por categoría real (consulta a tabla categories + `getProductsByCategory`)
+- [ ] Link WhatsApp real en el CTA (módulo payments.whatsapp)
+- [ ] Metadata/SEO (og tags, descripción por página)
+
+## Notas
+
+- [x] Categorías ya no hardcodeadas: se leen de la tabla `categories`.
+- [x] Productos con `category_id` (relación `products.category_id → categories.id`).

@@ -9,6 +9,7 @@ const products = [
     stock: 5,
     image_url: '',
     active: true,
+    category: 'cartas',
   },
   {
     name: 'Pikachu VMAX (VMAX Climax)',
@@ -17,6 +18,7 @@ const products = [
     stock: 8,
     image_url: '',
     active: true,
+    category: 'cartas',
   },
   {
     name: 'Sleeves Dragon Shield (Matte 60)',
@@ -25,6 +27,7 @@ const products = [
     stock: 20,
     image_url: '',
     active: true,
+    category: 'sleeves',
   },
   {
     name: 'Toploader Ultra Pro (25 u)',
@@ -33,6 +36,7 @@ const products = [
     stock: 30,
     image_url: '',
     active: true,
+    category: 'sleeves',
   },
   {
     name: 'Booster Lost Origin (10 sobres)',
@@ -41,6 +45,7 @@ const products = [
     stock: 3,
     image_url: '',
     active: true,
+    category: 'boosters',
   },
   {
     name: 'Caja Binder Pikachu',
@@ -49,6 +54,7 @@ const products = [
     stock: 12,
     image_url: '',
     active: true,
+    category: 'accesorios',
   },
 ]
 
@@ -66,10 +72,14 @@ async function main() {
   }
 
   for (const p of products) {
+    const { rows } = await c.query(
+      'select id from public.categories where slug = $1',
+      [p.category]
+    )
     await c.query(
-      `insert into public.products (name, description, price, stock, image_url, active)
-       values ($1, $2, $3, $4, $5, $6)`,
-      [p.name, p.description, p.price, p.stock, p.image_url, p.active]
+      `insert into public.products (name, description, price, stock, image_url, active, category_id)
+       values ($1, $2, $3, $4, $5, $6, $7)`,
+      [p.name, p.description, p.price, p.stock, p.image_url, p.active, rows[0]?.id ?? null]
     )
   }
 

@@ -6,6 +6,14 @@ export type Profile = {
   created_at: string
 }
 
+export type Category = {
+  id: string
+  name: string
+  slug: string
+  emoji: string | null
+  created_at: string
+}
+
 export type Product = {
   id: string
   name: string
@@ -14,6 +22,8 @@ export type Product = {
   image_url: string | null
   stock: number
   active: boolean
+  category_id: string | null
+  category?: Category | null
   created_at: string
 }
 

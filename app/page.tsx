@@ -1,15 +1,8 @@
 import Link from 'next/link'
-import { getProducts } from '@/lib/data'
+import { getProducts, getCategories } from '@/lib/data'
 import ProductCard from '@/components/product-card'
 
 export const dynamic = 'force-dynamic'
-
-const categories = [
-  { name: 'Cartas individuales', emoji: '🃏', tag: 'Cartas' },
-  { name: 'Sobres y Boosters', emoji: '📦', tag: 'Booster' },
-  { name: 'Sleeves y Protectores', emoji: '🛡️', tag: 'Sleeves' },
-  { name: 'Accesorios', emoji: '🎒', tag: 'Binder' },
-]
 
 const features = [
   { title: 'Envío seguro', desc: 'Protección rígida y seguimiento en todo el país.', emoji: '📦' },
@@ -18,8 +11,24 @@ const features = [
   { title: 'Colección curada', desc: 'Solo productos que elegimos para tu binder.', emoji: '⭐' },
 ]
 
-export default async function Home() {
-  const products = await getProducts()
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ cat?: string }>
+}) {
+  const [{ cat }, categories] = await Promise.all([
+    searchParams,
+    getCategories(),
+  ])
+
+  const activeCategory = cat
+    ? categories.find((c) => c.slug === cat)
+    : undefined
+
+  const products = activeCategory
+    ? (await getProducts()).filter((p) => p.category?.slug === cat)
+    : await getProducts()
+
   const featured = products.slice(0, 8)
 
   return (
@@ -103,17 +112,17 @@ export default async function Home() {
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {categories.map((c) => (
             <Link
-              key={c.name}
-              href={`/?q=${encodeURIComponent(c.tag)}`}
-              className="group rounded-2xl border border-neutral-200 bg-white p-6 transition hover:border-neutral-900 hover:shadow-sm"
+              key={c.id}
+              href={activeCategory?.slug === c.slug ? '/' : `/?cat=${c.slug}`}
+              className={`group rounded-2xl border p-6 transition hover:shadow-sm ${
+                activeCategory?.slug === c.slug
+                  ? 'border-neutral-900 bg-neutral-950 text-white'
+                  : 'border-neutral-200 bg-white'
+              }`}
             >
               <span className="text-3xl">{c.emoji}</span>
-              <p className="mt-4 text-sm font-semibold group-hover:text-neutral-900">
-                {c.name}
-              </p>
-              <p className="mt-1 text-xs text-neutral-400 group-hover:text-neutral-500">
-                Ver productos →
-              </p>
+              <p className="mt-4 text-sm font-semibold">{c.name}</p>
+              <p className="mt-1 text-xs opacity-60">Ver productos →</p>
             </Link>
           ))}
         </div>
@@ -123,14 +132,20 @@ export default async function Home() {
       <section id="productos" className="mx-auto max-w-6xl px-4 pb-16">
         <div className="flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Productos destacados</h2>
+            <h2 className="text-2xl font-bold tracking-tight">
+              {activeCategory ? activeCategory.name : 'Productos destacados'}
+            </h2>
             <p className="mt-1 text-sm text-neutral-500">
-              Actualizamos la selección seguido
+              {activeCategory
+                ? 'Filtrado por categoría'
+                : 'Actualizamos la selección seguido'}
             </p>
           </div>
-          <Link href="/#productos" className="text-sm font-medium text-neutral-900 hover:underline">
-            Ver todo
-          </Link>
+          {activeCategory && (
+            <Link href="/#productos" className="text-sm font-medium text-neutral-900 hover:underline">
+              Ver todos
+            </Link>
+          )}
         </div>
         {featured.length === 0 ? (
           <p className="mt-10 text-center text-neutral-500">

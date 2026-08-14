@@ -6,6 +6,7 @@ import { createProduct, updateProduct } from '@/lib/actions'
 export default function ProductForm({
   initial,
   action,
+  categories,
 }: {
   initial?: {
     id: string
@@ -14,8 +15,10 @@ export default function ProductForm({
     price: number
     stock: number
     image_url: string | null
+    category_id: string | null
   }
   action: 'create' | 'update'
+  categories: { id: string; name: string }[]
 }) {
   const router = useRouter()
 
@@ -85,6 +88,21 @@ export default function ProductForm({
           defaultValue={initial?.image_url ?? ''}
           className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
+      </div>
+      <div>
+        <label className="text-sm font-medium">Categoría</label>
+        <select
+          name="category_id"
+          defaultValue={initial?.category_id ?? ''}
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        >
+          <option value="">Sin categoría</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
       </div>
       <button
         type="submit"

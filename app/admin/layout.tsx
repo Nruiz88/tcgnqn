@@ -35,6 +35,12 @@ export default async function AdminLayout({
         >
           Pedidos
         </a>
+        <a
+          href="/admin/categories"
+          className="text-sm font-medium hover:text-neutral-600"
+        >
+          Categorías
+        </a>
       </nav>
       <div className="mt-6">{children}</div>
     </div>
