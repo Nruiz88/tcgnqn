@@ -6,8 +6,15 @@ export default async function NewProductPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold">Nuevo producto</h2>
-      <div className="mt-4">
+      <div>
+        <h2 className="font-display text-xl font-bold tracking-tight">
+          Nuevo producto
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          Completá los datos para sumarlo al catálogo
+        </p>
+      </div>
+      <div className="mt-6">
         <ProductForm
           action="create"
           categories={categories.map((c) => ({ id: c.id, name: c.name }))}

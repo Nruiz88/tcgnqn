@@ -21,8 +21,15 @@ export default async function EditProductPage({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold">Editar producto</h2>
-      <div className="mt-4">
+      <div>
+        <h2 className="font-display text-xl font-bold tracking-tight">
+          Editar producto
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          Actualizá los datos del producto
+        </p>
+      </div>
+      <div className="mt-6">
         <ProductForm
           action="update"
           categories={categories.map((c) => ({ id: c.id, name: c.name }))}

@@ -3,6 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { createProduct, updateProduct } from '@/lib/actions'
 
+const inputCls =
+  'mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none'
+const labelCls = 'text-xs font-medium text-neutral-500'
+
 export default function ProductForm({
   initial,
   action,
@@ -39,65 +43,65 @@ export default function ProductForm({
         router.push('/admin')
         router.refresh()
       }}
-      className="max-w-lg space-y-4"
+      className="max-w-lg space-y-5 rounded-2xl border border-neutral-200 bg-surface p-6"
     >
       <div>
-        <label className="text-sm font-medium">Nombre</label>
+        <label className={labelCls}>Nombre</label>
         <input
           name="name"
           required
           defaultValue={initial?.name}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className={inputCls}
         />
       </div>
       <div>
-        <label className="text-sm font-medium">Descripción</label>
+        <label className={labelCls}>Descripción</label>
         <textarea
           name="description"
           rows={4}
           defaultValue={initial?.description ?? ''}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className={inputCls}
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Precio (ARS)</label>
+          <label className={labelCls}>Precio (ARS)</label>
           <input
             type="number"
             name="price"
             required
             min={0}
             defaultValue={initial?.price ?? 0}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className={inputCls}
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Stock</label>
+          <label className={labelCls}>Stock</label>
           <input
             type="number"
             name="stock"
             required
             min={0}
             defaultValue={initial?.stock ?? 0}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className={inputCls}
           />
         </div>
       </div>
       <div>
-        <label className="text-sm font-medium">URL de imagen</label>
+        <label className={labelCls}>URL de imagen</label>
         <input
           name="image_url"
           placeholder="https://..."
           defaultValue={initial?.image_url ?? ''}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className={inputCls}
         />
       </div>
       <div>
-        <label className="text-sm font-medium">Categoría</label>
+        <label className={labelCls}>Categoría</label>
         <select
           name="category_id"
           defaultValue={initial?.category_id ?? ''}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className={inputCls}
         >
           <option value="">Sin categoría</option>
           {categories.map((c) => (
@@ -108,11 +112,11 @@ export default function ProductForm({
         </select>
       </div>
       <div>
-        <label className="text-sm font-medium">Juego</label>
+        <label className={labelCls}>Juego</label>
         <select
           name="game_id"
           defaultValue={initial?.game_id ?? ''}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className={inputCls}
         >
           <option value="">Sin juego</option>
           {games.map((g) => (
@@ -125,7 +129,7 @@ export default function ProductForm({
       </div>
       <button
         type="submit"
-        className="rounded-md bg-black px-6 py-3 text-sm font-semibold text-white"
+        className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
       >
         {action === 'create' ? 'Crear producto' : 'Guardar cambios'}
       </button>

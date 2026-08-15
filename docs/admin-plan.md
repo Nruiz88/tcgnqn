@@ -5,14 +5,14 @@ Guía de verificación para el panel de administración.
 ## Interfaz
 
 - [x] Layout `/admin` con auth + rol admin (redirige a `/login` o `/`)
-- [x] Navbar del panel: Productos · Pedidos
+- [x] Sidebar con navegación e íconos + header "Volver a la tienda"
+- [x] Dashboard con KPIs (productos activos, stock bajo, pedidos pendientes, ingresos)
 - [x] Lista de productos: imagen, nombre, precio, stock, badge Oculto
 - [x] Botones Publicar/Ocultar y Editar por producto
 - [x] Botón "Nuevo producto" → form crear
 - [x] Form crear/editar producto (nombre, descripción, precio ARS, stock, URL imagen)
 - [x] Lista de pedidos: nombre/tel/dirección, fecha, notas, total, items, selector de estado
 - [x] CRUD de categorías (asignar al crear/editar producto)
-- [ ] Dashboard con KPIs (productos activos, stock bajo, pedidos pendientes)
 - [x] Gestión de cupones (CRUD admin + Pausar/Activar)
 - [ ] Búsqueda y filtros en lista de productos
 - [ ] Paginación de listas
@@ -22,7 +22,7 @@ Guía de verificación para el panel de administración.
 - [x] Badge de color por estado de pedido
 - [x] Descuento de cupón visible en pedido
 - [ ] Confirmación en acciones destructivas
-- [ ] Vista responsive del panel
+- [x] Vista responsive del panel (nav horizontal en mobile, sidebar en desktop)
 
 ## Funcionalidad
 
