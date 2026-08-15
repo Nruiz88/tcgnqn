@@ -68,6 +68,7 @@ export type OrderItem = {
   product_id: string
   quantity: number
   price: number
+  product_name: string | null
   product?: Product
 }
 

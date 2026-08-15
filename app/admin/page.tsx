@@ -3,6 +3,7 @@ import { getAllProducts, getAllOrders } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
 import { toggleProduct } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/orders'
 import { Icon, btnSecondary, type IconName } from '@/components/admin-ui'
 
 export const dynamic = 'force-dynamic'
@@ -22,20 +23,6 @@ function stockBadge(stock: number) {
     label: 'Disponible',
     cls: 'bg-green-500/10 text-green-600 ring-green-500/20 dark:text-green-400',
   }
-}
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pendiente',
-  confirmed: 'Confirmado',
-  shipped: 'Enviado',
-  cancelled: 'Cancelado',
-}
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-500/10 text-amber-600 ring-amber-500/20 dark:text-amber-400',
-  confirmed: 'bg-blue-500/10 text-blue-600 ring-blue-500/20 dark:text-blue-400',
-  shipped: 'bg-green-500/10 text-green-600 ring-green-500/20 dark:text-green-400',
-  cancelled: 'bg-red-500/10 text-red-600 ring-red-500/20 dark:text-red-400',
 }
 
 const badgeCls = (color: string) =>
@@ -322,9 +309,9 @@ export default async function AdminDashboardPage() {
                       {formatPrice(o.total)}
                     </span>
                     <span
-                      className={`mt-0.5 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${STATUS_COLORS[o.status]}`}
+                      className={`mt-0.5 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${ORDER_STATUS_COLORS[o.status]}`}
                     >
-                      {STATUS_LABELS[o.status]}
+                      {ORDER_STATUS_LABELS[o.status]}
                     </span>
                   </span>
                 </Link>

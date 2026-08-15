@@ -1,26 +1,12 @@
 import { getAllOrders } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
-import type { OrderStatus } from '@/lib/types'
 import { isEnabled } from '@/lib/modules'
 import { whatsappNumber } from '@/lib/whatsapp'
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/orders'
 import { Icon, PageHeader, EmptyState } from '@/components/admin-ui'
 import OrderStatusSelect from '@/components/order-status-select'
 
 export const dynamic = 'force-dynamic'
-
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: 'Pendiente',
-  confirmed: 'Confirmado',
-  shipped: 'Enviado',
-  cancelled: 'Cancelado',
-}
-
-const STATUS_COLORS: Record<OrderStatus, string> = {
-  pending: 'bg-amber-500/10 text-amber-600 ring-amber-500/20 dark:text-amber-400',
-  confirmed: 'bg-blue-500/10 text-blue-600 ring-blue-500/20 dark:text-blue-400',
-  shipped: 'bg-green-500/10 text-green-600 ring-green-500/20 dark:text-green-400',
-  cancelled: 'bg-red-500/10 text-red-600 ring-red-500/20 dark:text-red-400',
-}
 
 export default async function AdminOrdersPage() {
   const orders = await getAllOrders()
@@ -114,9 +100,9 @@ export default async function AdminOrdersPage() {
               </div>
               <div className="flex items-center gap-3">
                 <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${STATUS_COLORS[order.status]}`}
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${ORDER_STATUS_COLORS[order.status]}`}
                 >
-                  {STATUS_LABELS[order.status]}
+                  {ORDER_STATUS_LABELS[order.status]}
                 </span>
                 <span className="font-display text-lg font-bold tracking-tight">
                   {formatPrice(order.total)}
@@ -169,7 +155,7 @@ export default async function AdminOrdersPage() {
                 />
                 {waEnabled && order.shipping_phone && storeNumber && (
                   <a
-                    href={`https://wa.me/${order.shipping_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${order.shipping_name}! Tu pedido en TCG NQN está ${STATUS_LABELS[order.status].toLowerCase()}.`)}`}
+                    href={`https://wa.me/${order.shipping_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${order.shipping_name}! Tu pedido en TCG NQN está ${ORDER_STATUS_LABELS[order.status].toLowerCase()}.`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="ml-auto inline-flex items-center gap-2 rounded-lg border border-green-300 px-3 py-1.5 text-sm font-medium text-green-600 transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/60 dark:text-green-400 dark:hover:bg-green-950/40"

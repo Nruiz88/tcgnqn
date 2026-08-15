@@ -167,6 +167,25 @@ export async function getAllOrders(): Promise<OrderWithItems[]> {
   return (orders ?? []) as OrderWithItems[]
 }
 
+export async function getMyOrder(
+  id: string,
+): Promise<OrderWithItems | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, items:order_items(*, product:products(*, category:categories(*), game:games(*)))')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .single()
+  if (error) return null
+  return data as OrderWithItems
+}
+
 export async function getSiteSettings(): Promise<SiteSettings | null> {
   const supabase = await createClient()
   const { data, error } = await supabase

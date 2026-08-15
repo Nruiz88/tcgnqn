@@ -55,6 +55,47 @@ export async function signOut() {
   redirect('/')
 }
 
+export async function updateProfile(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const fullName = String(formData.get('full_name') ?? '').trim()
+  const phone = String(formData.get('phone') ?? '').trim()
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert(
+      {
+        id: user.id,
+        full_name: fullName || null,
+        phone: phone || null,
+      },
+      { onConflict: 'id' },
+    )
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+export async function updatePassword(formData: FormData) {
+  const supabase = await createClient()
+  const password = String(formData.get('password') ?? '')
+  const confirm = String(formData.get('confirm') ?? '')
+
+  if (password.length < 6) {
+    return { error: 'La contraseña debe tener al menos 6 caracteres' }
+  }
+  if (password !== confirm) {
+    return { error: 'Las contraseñas no coinciden' }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
 export async function quoteShippingForCheckout(
   postalCode: string,
   weightKg: number,
@@ -100,11 +141,12 @@ export async function createOrder(formData: FormData) {
   const productIds = cart.map((i) => i.product.id)
   const { data: products, error: productsError } = await supabase
     .from('products')
-    .select('id, price')
+    .select('id, price, name')
     .in('id', productIds)
   if (productsError || !products) return { error: 'Error de productos' }
 
   const priceMap = new Map(products.map((p) => [p.id, p.price]))
+  const nameMap = new Map(products.map((p) => [p.id, p.name]))
   let total = cart.reduce(
     (acc, i) => acc + (priceMap.get(i.product.id) ?? 0) * i.quantity,
     0,
@@ -187,6 +229,7 @@ export async function createOrder(formData: FormData) {
       product_id: i.product.id,
       quantity: i.quantity,
       price: priceMap.get(i.product.id) ?? 0,
+      product_name: nameMap.get(i.product.id) ?? null,
     })),
   )
   if (itemsError) return { error: 'No se pudo guardar los ítems' }
