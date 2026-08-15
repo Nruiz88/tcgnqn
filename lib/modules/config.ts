@@ -11,7 +11,10 @@ export const modules: Record<ModuleKey, boolean> = {
   'payments.transferencia': true,
   'payments.whatsapp': !!process.env.NEXT_PUBLIC_WHATSAPP,
   'payments.mercadopago': false,
-  'shipping.correo_argentino': !!process.env.CORREO_ARGENTINO_API_KEY,
+  'shipping.correo_argentino':
+    !!process.env.CORREO_ARGENTINO_USER_TOKEN &&
+    !!process.env.CORREO_ARGENTINO_PASSWORD_TOKEN &&
+    !!process.env.CORREO_ARGENTINO_SENDER_CP,
   wishlist: true,
   coupons: process.env.ENABLE_COUPONS === 'true',
   orders_notifications:

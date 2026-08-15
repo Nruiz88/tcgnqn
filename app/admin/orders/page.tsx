@@ -47,7 +47,15 @@ export default async function AdminOrdersPage() {
                 <p className="text-xs text-neutral-500">
                   {new Date(order.created_at).toLocaleString('es-AR')} ·{' '}
                   {order.shipping_address}
+                  {order.shipping_cp && ` (CP ${order.shipping_cp})`}
                 </p>
+                {order.shipping_label && (
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Envío: {order.shipping_label}
+                    {order.shipping_price > 0 &&
+                      ` · ${formatPrice(order.shipping_price)}`}
+                  </p>
+                )}
                 {order.notes && (
                   <p className="mt-1 text-xs text-neutral-500">
                     Notas: {order.notes}

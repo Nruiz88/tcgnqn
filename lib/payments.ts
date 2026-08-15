@@ -55,12 +55,14 @@ export function buildWhatsappCheckoutLink(
   items: CartItem[],
   customerName: string,
   customerPhone: string,
+  shippingInfo?: string,
 ): string | null {
   const number = whatsappNumber()
   if (!number) return null
   const msg =
     `Hola! Quiero hacer este pedido:\n` +
     `\n${cartSummary(items)}\n` +
+    (shippingInfo ? `\nEnvío: ${shippingInfo}\n` : '') +
     `\nNombre: ${customerName}\nTel: ${customerPhone}`
   return buildWhatsappLink(msg)
 }

@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import type { CartItem, OrderStatus } from '@/lib/types'
 import { isEnabled } from '@/lib/modules'
 import { whatsappNumber, buildWhatsappLink, cartSummary } from '@/lib/whatsapp'
+import { quoteShipping } from '@/lib/shipping'
+import type { ShippingQuote } from '@/lib/shipping'
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient()
@@ -51,6 +53,27 @@ export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   redirect('/')
+}
+
+export async function quoteShippingForCheckout(
+  postalCode: string,
+  weightKg: number,
+  declaredValue: number,
+): Promise<ShippingQuote[]> {
+  const cp = postalCode.trim()
+  if (!cp) return []
+  const quotes = await quoteShipping(
+    { postalCode: cp },
+    { weightKg, declaredValue },
+  )
+  // Devolvemos solo campos serializables (la UI es client component).
+  return quotes.map((q) => ({
+    service: q.service,
+    label: q.label,
+    price: q.price,
+    estimatedDays: q.estimatedDays,
+    deliveredType: q.deliveredType,
+  }))
 }
 
 export async function createOrder(formData: FormData) {
@@ -116,6 +139,28 @@ export async function createOrder(formData: FormData) {
   }
   total = Math.max(0, Math.round(total - discount))
 
+  // Envío: se recotiza acá (server) para no confiar en el valor del cliente.
+  const shippingMethod = String(formData.get('shipping_method') ?? 'pickup')
+  const shippingCp = String(formData.get('shipping_cp') ?? '').trim()
+  let shippingLabel = 'Retiro en el local'
+  let shippingPrice = 0
+  if (shippingMethod !== 'pickup') {
+    if (!shippingCp) return { error: 'Falta el código postal para el envío' }
+    const cartWeightKg = Math.max(
+      0.5,
+      cart.reduce((acc, i) => acc + i.quantity * 0.2, 0),
+    )
+    const quotes = await quoteShipping(
+      { postalCode: shippingCp },
+      { weightKg: cartWeightKg, declaredValue: total },
+    )
+    const quote = quotes.find((q) => q.service === shippingMethod)
+    if (!quote) return { error: 'Método de envío inválido' }
+    shippingLabel = quote.label
+    shippingPrice = Math.round(quote.price)
+    total += shippingPrice
+  }
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -126,6 +171,10 @@ export async function createOrder(formData: FormData) {
       shipping_name: name,
       shipping_phone: phone,
       shipping_address: address,
+      shipping_method: shippingMethod,
+      shipping_label: shippingLabel,
+      shipping_price: shippingPrice,
+      shipping_cp: shippingCp || null,
       notes: notes || null,
     })
     .select()
@@ -155,6 +204,9 @@ export async function createOrder(formData: FormData) {
       const msg =
         `Nuevo pedido #${order.id.slice(0, 8)}\n` +
         `${name}\n${phone}\n${address}\n` +
+        `Envío: ${shippingLabel}${
+          shippingPrice > 0 ? ` (${shippingPrice})` : ''
+        }\n` +
         `\n${cartSummary(cart)}\n` +
         `Total: ${total}`
       const link = buildWhatsappLink(msg)

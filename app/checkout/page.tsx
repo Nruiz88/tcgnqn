@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/lib/cart-context'
-import { createOrder } from '@/lib/actions'
+import { createOrder, quoteShippingForCheckout } from '@/lib/actions'
 import { formatPrice } from '@/lib/format'
 import { isEnabled } from '@/lib/modules'
 import {
@@ -12,6 +12,15 @@ import {
   buildWhatsappCheckoutLink,
 } from '@/lib/payments'
 import type { PaymentMethodId } from '@/lib/payments'
+import type { ShippingQuote } from '@/lib/shipping'
+
+const PICKUP: ShippingQuote = {
+  service: 'pickup',
+  label: 'Retiro en el local',
+  price: 0,
+  estimatedDays: 'Coordinamos el día por WhatsApp',
+  deliveredType: 'S',
+}
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCart()
@@ -20,8 +29,54 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [postalCode, setPostalCode] = useState('')
+  const [quotes, setQuotes] = useState<ShippingQuote[]>([])
+  const [shipping, setShipping] = useState<ShippingQuote>(PICKUP)
+  const [quoting, setQuoting] = useState(false)
   const methods = getPaymentMethods()
   const [method, setMethod] = useState<PaymentMethodId>(methods[0]?.id ?? 'transferencia')
+
+  const cartWeightKg = Math.max(
+    0.5,
+    items.reduce((acc, i) => acc + i.quantity * 0.2, 0),
+  )
+
+  const fetchQuotes = useCallback(
+    async (cp: string) => {
+      if (!cp || cp.replace(/\D/g, '').length < 4) {
+        setQuotes([])
+        setShipping(PICKUP)
+        return
+      }
+      setQuoting(true)
+      try {
+        const result = await quoteShippingForCheckout(
+          cp,
+          cartWeightKg,
+          total,
+        )
+        setQuotes(result)
+        // Mantener el método elegido si sigue disponible; si no, el primero.
+        setShipping((prev) => {
+          if (prev && result.some((q) => q.service === prev.service)) {
+            return prev
+          }
+          return result[0] ?? null
+        })
+      } catch {
+        setQuotes([])
+        setShipping(PICKUP)
+      } finally {
+        setQuoting(false)
+      }
+    },
+    [cartWeightKg, total],
+  )
+
+  useEffect(() => {
+    const t = setTimeout(() => fetchQuotes(postalCode), 400)
+    return () => clearTimeout(t)
+  }, [postalCode, fetchQuotes])
 
   if (items.length === 0) {
     return (
@@ -32,10 +87,20 @@ export default function CheckoutPage() {
   }
 
   const instructions = buildPaymentInstructions(method)
+  const shippingPrice = shipping?.price ?? 0
+  const grandTotal = total + shippingPrice
 
   const handleSubmit = async (formData: FormData) => {
+    // El método de envío viaja en el form; el server recotiza y valida.
+    formData.set('shipping_method', shipping?.service ?? 'pickup')
+    formData.set('shipping_cp', postalCode)
     if (method === 'whatsapp') {
-      const link = buildWhatsappCheckoutLink(items, name, phone)
+      const link = buildWhatsappCheckoutLink(
+        items,
+        name,
+        phone,
+        shipping?.label ? `${shipping.label} (${formatPrice(shippingPrice)})` : undefined,
+      )
       if (link) {
         window.open(link, '_blank')
         return
@@ -88,6 +153,65 @@ export default function CheckoutPage() {
               className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
             />
           </div>
+
+          <div>
+            <label className="text-sm font-medium">
+              Código postal <span className="text-neutral-400">(para envío)</span>
+            </label>
+            <input
+              inputMode="numeric"
+              value={postalCode}
+              onChange={(e) => setPostalCode(e.target.value)}
+              placeholder="Ej. 8300"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Método de envío</label>
+            {quoting && (
+              <p className="mt-1 text-xs text-neutral-500">
+                Cotizando envío...
+              </p>
+            )}
+            {!quoting && quotes.length === 0 && (
+              <p className="mt-1 text-xs text-neutral-500">
+                Ingresá un código postal para ver las opciones de Correo
+                Argentino.
+              </p>
+            )}
+            <div className="mt-1 space-y-2">
+              {(quotes.length === 0 ? [PICKUP] : quotes).map((q) => (
+                <label
+                  key={q.service}
+                  className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer ${
+                    shipping?.service === q.service
+                      ? 'border-neutral-900 bg-neutral-50'
+                      : 'border-neutral-200'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="shipping_service"
+                    value={q.service}
+                    checked={shipping?.service === q.service}
+                    onChange={() => setShipping(q)}
+                    className="mt-1"
+                  />
+                  <span className="flex-1">
+                    <span className="block text-sm font-medium">{q.label}</span>
+                    <span className="block text-xs text-neutral-500">
+                      {q.estimatedDays}
+                    </span>
+                  </span>
+                  <span className="text-sm font-semibold">
+                    {q.price === 0 ? 'Gratis' : formatPrice(q.price)}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
           <div>
             <label className="text-sm font-medium">Método de pago</label>
             <div className="mt-1 space-y-2">
@@ -174,9 +298,25 @@ export default function CheckoutPage() {
               </li>
             ))}
           </ul>
-          <div className="mt-4 flex justify-between border-t border-neutral-200 pt-4">
-            <span className="font-semibold">Total</span>
-            <span className="font-bold">{formatPrice(total)}</span>
+          <div className="mt-4 space-y-2 border-t border-neutral-200 pt-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-neutral-600">Subtotal</span>
+              <span>{formatPrice(total)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-neutral-600">Envío</span>
+              <span>
+                {shipping
+                  ? shipping.price === 0
+                    ? 'Gratis'
+                    : formatPrice(shippingPrice)
+                  : '—'}
+              </span>
+            </div>
+            <div className="flex justify-between border-t border-neutral-200 pt-2">
+              <span className="font-semibold">Total</span>
+              <span className="font-bold">{formatPrice(grandTotal)}</span>
+            </div>
           </div>
         </div>
       </div>

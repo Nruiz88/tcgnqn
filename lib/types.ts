@@ -38,6 +38,10 @@ export type Order = {
   shipping_name: string
   shipping_phone: string
   shipping_address: string
+  shipping_method: string | null
+  shipping_label: string | null
+  shipping_price: number
+  shipping_cp: string | null
   notes: string | null
   created_at: string
 }

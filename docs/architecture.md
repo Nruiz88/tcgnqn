@@ -35,7 +35,8 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 
 | Módulo | Default | Activación | Comportamiento |
 |---|---|---|---|
-| `shipping.correo_argentino` | OFF | credenciales API | Cotización en checkout, guía desde admin, tracking | 🔲 contrato listo |
+| `shipping.correo_argentino` | OFF | `CORREO_ARGENTINO_USER_TOKEN` + `PASSWORD_TOKEN` + `SENDER_CP` | Cotización real (Paq.AR) a domicilio/sucursal, guía desde admin, tracking | ✅ implementado |
+| `shipping.pickup` | ON | siempre | Retiro en el local (fallback si no hay credenciales) | ✅ implementado |
 
 ### Módulos de negocio
 
@@ -72,5 +73,11 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 | `NEXT_PUBLIC_MODULES` | Lista de módulos activos (override) |
 | `NEXT_PUBLIC_WHATSAPP` | Número del negocio (activa payments.whatsapp y orders_notifications) |
 | `ENABLE_COUPONS` | Activa coupons |
-| `CORREO_ARGENTINO_API_URL` / `API_KEY` / `SENDER_CP` | Activan shipping.correo_argentino |
+| `CORREO_ARGENTINO_API_URL` | URL base de la API MiCorreo (default prod) |
+| `CORREO_ARGENTINO_USER_TOKEN` / `PASSWORD_TOKEN` | HTTP Basic → JWT (`POST /token`) |
+| `CORREO_ARGENTINO_CUSTOMER_ID` | customerId de MiCorreo (saltea /users/validate) |
+| `CORREO_ARGENTINO_EMAIL` / `PASSWORD` | Para `/users/validate` si no hay CUSTOMER_ID |
+| `CORREO_ARGENTINO_SENDER_CP` | Código postal de origen (obligatorio) |
+| `CORREO_ARGENTINO_PKG_DIMS` | Dimensiones por defecto del paquete `largo,ancho,alto` (cm) |
+| `NEXT_PUBLIC_PICKUP_LOCATION` | Dirección del local para el retiro (fallback) |
 | Credenciales MP | Activan payments.mercadopago |

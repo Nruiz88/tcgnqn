@@ -81,6 +81,13 @@ export default async function AccountPage() {
                   </span>
                 </div>
               </div>
+              {order.shipping_label && (
+                <p className="mt-2 text-xs text-neutral-500">
+                  Envío: {order.shipping_label}
+                  {order.shipping_price > 0 &&
+                    ` · ${formatPrice(order.shipping_price)}`}
+                </p>
+              )}
               <ul className="mt-3 space-y-1 text-sm text-neutral-600">
                 {order.items.map((item) => (
                   <li key={item.id} className="flex justify-between">

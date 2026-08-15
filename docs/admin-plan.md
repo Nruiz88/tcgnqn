@@ -31,3 +31,7 @@ Guía de verificación para el panel de administración.
 - [x] Server Actions: `createProduct`, `updateProduct`, `toggleProduct`, `updateOrderStatus`
 - [x] Server Action: CRUD de categorías
 - [ ] Generación de guía Correo Argentino desde pedido (módulo shipping)
+  - ✅ `lib/shipping.ts`: gateway implementado con API MiCorreo real (`quote`, `createLabel`, `track`) + fallback a retiro en local
+  - [ ] UI en `/admin/orders` para generar la guía y guardar el tracking
+  - [x] Checkout con selector de envío (cotización en vivo por CP) + retiro en local
+  - [x] Costo de envío en el total del pedido (recotizado server-side) y visible en admin/cuenta
