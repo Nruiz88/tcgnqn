@@ -116,6 +116,14 @@ export default function CardArt({
     </div>
   )
 
+  const cardBody = (
+    <>
+      {header}
+      {image}
+      {showInfo && info}
+    </>
+  )
+
   return (
     <div
       ref={ref}
@@ -127,28 +135,17 @@ export default function CardArt({
         className={`rounded-2xl bg-gradient-to-br p-[2.5px] shadow-lg transition-shadow duration-300 group-hover:shadow-xl ${rarity.border}`}
       >
         <div className="overflow-hidden rounded-[14px] bg-surface">
-          {bodyHref ? (
-            <a href={bodyHref} className="block">
-              {header}
-            </a>
-          ) : (
-            header
-          )}
           {imageHref ? (
             <QuickViewLink href={imageHref} className="block">
-              {image}
+              {cardBody}
             </QuickViewLink>
+          ) : bodyHref ? (
+            <a href={bodyHref} className="block">
+              {cardBody}
+            </a>
           ) : (
-            image
+            cardBody
           )}
-          {showInfo &&
-            (bodyHref ? (
-              <a href={bodyHref} className="block">
-                {info}
-              </a>
-            ) : (
-              info
-            ))}
         </div>
       </div>
     </div>

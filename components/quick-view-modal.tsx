@@ -15,12 +15,6 @@ export default function QuickViewModal({ product }: { product: Product }) {
   const cardProduct = isCard(product)
 
   function close() {
-    const from = sessionStorage.getItem('qv_from')
-    if (from) {
-      sessionStorage.removeItem('qv_from')
-      router.replace(from)
-      return
-    }
     router.back()
   }
 

@@ -43,22 +43,22 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
+        <div className="p-4">
+          <h3 className="truncate text-sm font-medium">{product.name}</h3>
+          {product.condition && (
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
+              <span
+                className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${conditionColor(product.condition)}`}
+              >
+                {product.condition}
+              </span>
+              {product.language &&
+                (LANGUAGE_LABELS[product.language] ?? product.language)}
+            </p>
+          )}
+          <p className="mt-1 text-sm font-semibold">{formatPrice(product.price)}</p>
+        </div>
       </QuickViewLink>
-      <a href={href} className="block p-4">
-        <h3 className="truncate text-sm font-medium">{product.name}</h3>
-        {product.condition && (
-          <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
-            <span
-              className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${conditionColor(product.condition)}`}
-            >
-              {product.condition}
-            </span>
-            {product.language &&
-              (LANGUAGE_LABELS[product.language] ?? product.language)}
-          </p>
-        )}
-        <p className="mt-1 text-sm font-semibold">{formatPrice(product.price)}</p>
-      </a>
     </div>
   )
 }

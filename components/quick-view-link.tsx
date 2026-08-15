@@ -12,18 +12,7 @@ export default function QuickViewLink({
   className?: string
 }) {
   return (
-    <Link
-      href={href}
-      className={className}
-      onClick={() => {
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem(
-            'qv_from',
-            window.location.pathname + window.location.search,
-          )
-        }
-      }}
-    >
+    <Link href={href} className={className}>
       {children}
     </Link>
   )
