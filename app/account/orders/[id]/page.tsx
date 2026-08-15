@@ -248,6 +248,37 @@ export default async function OrderDetailPage({
         </dl>
       </section>
 
+      {/* Seguimiento del envío */}
+      {order.shipping_label_reference && (
+        <section className="mt-6">
+          <h2 className="font-display text-lg font-bold tracking-tight">
+            Seguimiento del envío
+          </h2>
+          <div className="mt-4 flex items-start gap-4 rounded-2xl border border-indigo-200 bg-indigo-500/5 p-5 dark:border-indigo-500/30">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
+              <Icon name="truck" className="h-5 w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium">Tu pedido está en camino 🚚</p>
+              <p className="mt-0.5 text-sm text-neutral-500">
+                Referencia: {order.shipping_label_reference}
+                {order.shipping_tracking_id &&
+                  ` · Nº de pieza: ${order.shipping_tracking_id}`}
+              </p>
+              <a
+                href="https://www.correoargentino.com.ar/formularios/seguimiento"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+              >
+                <Icon name="truck" className="h-4 w-4" />
+                Seguir envío en Correo Argentino
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Ayuda */}
       {waNumber && (
         <div className="mt-8 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-neutral-300 px-6 py-8 text-center">

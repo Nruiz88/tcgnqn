@@ -2,16 +2,33 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import type { CartItem, OrderStatus, SiteSettings, SocialKey } from '@/lib/types'
+import { createAdminClient } from '@/lib/supabase/admin'
+import type {
+  CartItem,
+  NotificationSettings,
+  OrderStatus,
+  ShippingSettings,
+  SiteSettings,
+  SocialKey,
+} from '@/lib/types'
 import { isEnabled } from '@/lib/modules'
 import { whatsappNumber, buildWhatsappLink } from '@/lib/whatsapp'
-import { quoteShipping } from '@/lib/shipping'
-import type { ShippingQuote } from '@/lib/shipping'
+import {
+  getCorreoArgentinoGateway,
+  invalidateCorreoCredentialsCache,
+  quoteShipping,
+} from '@/lib/shipping'
+import type { ShippingPackage, ShippingQuote } from '@/lib/shipping'
 import {
   createPreference,
   getMercadoPagoCredentials,
   getPayment,
 } from '@/lib/mercadopago'
+import {
+  invalidateWhatsAppCredentialsCache,
+  notifyOrderEvent,
+  TRACKING_URL,
+} from '@/lib/notifications'
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient()
@@ -522,6 +539,75 @@ export async function updateMercadoPagoSettings(formData: FormData) {
   return { ok: true }
 }
 
+export async function updateShippingSettings(formData: FormData) {
+  const supabase = createAdminClient()
+  const { data: current } = await supabase
+    .from('shipping_settings')
+    .select('*')
+    .eq('id', 1)
+    .single()
+  const cur = (current as ShippingSettings | null) ?? null
+
+  type ShippingField =
+    | 'correo_user_token'
+    | 'correo_password_token'
+    | 'correo_email'
+    | 'correo_password'
+    | 'correo_customer_id'
+    | 'correo_sender_cp'
+  const pick = (key: ShippingField): string | null => {
+    const v = String(formData.get(key) ?? '').trim()
+    const saved = cur?.[key]
+    return v || (typeof saved === 'string' ? saved : null)
+  }
+
+  const { error } = await supabase.from('shipping_settings').upsert(
+    {
+      id: 1,
+      correo_user_token: pick('correo_user_token'),
+      correo_password_token: pick('correo_password_token'),
+      correo_email: pick('correo_email'),
+      correo_password: pick('correo_password'),
+      correo_customer_id: pick('correo_customer_id'),
+      correo_sender_cp: pick('correo_sender_cp'),
+    },
+    { onConflict: 'id' },
+  )
+  if (error) return { error: error.message }
+  // Refrescar la caché de credenciales para que el envío tome los nuevos datos.
+  invalidateCorreoCredentialsCache()
+  return { ok: true }
+}
+
+export async function updateNotificationSettings(formData: FormData) {
+  const supabase = createAdminClient()
+  const { data: current } = await supabase
+    .from('notification_settings')
+    .select('*')
+    .eq('id', 1)
+    .single()
+  const cur = (current as NotificationSettings | null) ?? null
+
+  type NotifField = 'whatsapp_token' | 'whatsapp_phone_id'
+  const pick = (key: NotifField): string | null => {
+    const v = String(formData.get(key) ?? '').trim()
+    const saved = cur?.[key]
+    return v || (typeof saved === 'string' ? saved : null)
+  }
+
+  const { error } = await supabase.from('notification_settings').upsert(
+    {
+      id: 1,
+      whatsapp_token: pick('whatsapp_token'),
+      whatsapp_phone_id: pick('whatsapp_phone_id'),
+    },
+    { onConflict: 'id' },
+  )
+  if (error) return { error: error.message }
+  invalidateWhatsAppCredentialsCache()
+  return { ok: true }
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient()
   const name = String(formData.get('name') ?? '')
@@ -607,12 +693,150 @@ export async function deleteProduct(id: string) {
 
 export async function updateOrderStatus(id: string, status: OrderStatus) {
   const supabase = await createClient()
+  const { data: order } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', id)
+    .single()
   const { error } = await supabase
     .from('orders')
     .update({ status })
     .eq('id', id)
   if (error) return { error: error.message }
+
+  // Al pasar a enviado avisamos al cliente (WhatsApp automático o link).
+  if (status === 'shipped' && order && order.status !== 'shipped') {
+    const notify = await notifyOrderEvent({
+      orderId: order.id,
+      customerName: order.shipping_name,
+      customerPhone: order.shipping_phone,
+      statusLabel: 'en camino',
+      trackingReference: order.shipping_label_reference,
+      trackingUrl: order.shipping_label_reference ? TRACKING_URL : null,
+    })
+    return { ok: true, notifySent: notify.sent, notifyLink: notify.link }
+  }
   return { ok: true }
+}
+
+/**
+ * Genera la guía de Correo Argentino (MiCorreo) para un pedido y guarda
+ * la referencia/tracking. Admin-only por RLS + layout /admin.
+ */
+export async function generateShippingLabel(
+  orderId: string,
+  formData: FormData,
+) {
+  const supabase = createAdminClient()
+  const { data: order } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single()
+  if (!order) return { error: 'Pedido no encontrado' }
+
+  const gateway = await getCorreoArgentinoGateway()
+  if (!gateway) {
+    return {
+      error:
+        'El módulo de Correo Argentino no está configurado. Cargá las credenciales en Panel admin → Configuración.',
+    }
+  }
+
+  const name = String(formData.get('name') ?? order.shipping_name ?? '').trim()
+  const phone = String(
+    formData.get('phone') ?? order.shipping_phone ?? '',
+  ).trim()
+  const email = String(formData.get('email') ?? '').trim()
+  const deliveredType =
+    String(formData.get('delivery_type') ?? 'D') === 'S' ? 'S' : 'D'
+  const agency = String(formData.get('agency') ?? '').trim()
+  const postalCode = String(
+    formData.get('postal_code') ?? order.shipping_cp ?? '',
+  ).trim()
+
+  if (!name) return { error: 'Falta el nombre del destinatario' }
+  if (!postalCode) return { error: 'Falta el código postal' }
+  if (deliveredType === 'S' && !agency) {
+    return { error: 'Elegí la sucursal de entrega' }
+  }
+
+  // El email se completa solo con el de la cuenta del cliente si no se
+  // completó en el form (MiCorreo lo pide para el destinatario).
+  let resolvedEmail = email
+  if (!resolvedEmail) {
+    try {
+      const { data: user } = await supabase.auth.admin.getUserById(order.user_id)
+      resolvedEmail = user?.user?.email ?? ''
+    } catch {
+      resolvedEmail = ''
+    }
+  }
+
+  const pkg: ShippingPackage = {
+    weightKg: Math.max(0.1, Number(formData.get('weight_kg') ?? 0.5) || 0.5),
+    declaredValue: Math.max(1, Number(order.total) || 1),
+  }
+
+  try {
+    const label = await gateway.createLabel({
+      orderId: order.id,
+      orderNumber: order.id.slice(0, 8).toUpperCase(),
+      recipient: {
+        name,
+        email: resolvedEmail,
+        phone: phone || undefined,
+        cellPhone: phone || undefined,
+      },
+      destination: {
+        postalCode,
+        street:
+          String(formData.get('street') ?? '').trim() || undefined,
+        streetNumber:
+          String(formData.get('street_number') ?? '').trim() || undefined,
+        floor: String(formData.get('floor') ?? '').trim() || undefined,
+        apartment:
+          String(formData.get('apartment') ?? '').trim() || undefined,
+        city: String(formData.get('city') ?? '').trim() || undefined,
+        provinceCode:
+          String(formData.get('province') ?? '').trim() || undefined,
+      },
+      pkg,
+      deliveredType,
+      agency: deliveredType === 'S' ? agency : undefined,
+    })
+
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        shipping_tracking_id: label.trackingId,
+        shipping_label_reference: label.reference,
+      })
+      .eq('id', order.id)
+    if (error) return { error: error.message }
+
+    // Aviso al cliente: guía generada, pedido despachado.
+    const notify = await notifyOrderEvent({
+      orderId: order.id,
+      customerName: name,
+      customerPhone: phone,
+      statusLabel: 'en camino',
+      trackingReference: label.reference,
+      trackingUrl: TRACKING_URL,
+    })
+
+    return {
+      ok: true,
+      trackingId: label.trackingId,
+      reference: label.reference,
+      notifySent: notify.sent,
+      notifyLink: notify.link,
+    }
+  } catch (e) {
+    return {
+      error: e instanceof Error ? e.message : 'No se pudo generar la guía',
+    }
+  }
 }
 
 export async function createCategory(formData: FormData) {

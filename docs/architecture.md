@@ -35,7 +35,7 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 
 | Módulo | Default | Activación | Comportamiento |
 |---|---|---|---|
-| `shipping.correo_argentino` | OFF | `CORREO_ARGENTINO_USER_TOKEN` + `PASSWORD_TOKEN` + `SENDER_CP` | Cotización real (Paq.AR) a domicilio/sucursal, guía desde admin, tracking | ✅ implementado |
+| `shipping.correo_argentino` | OFF | credenciales en Panel admin → Configuración (o `CORREO_ARGENTINO_*` en env) | Cotización real (Paq.AR) a domicilio/sucursal, guía desde admin, tracking | ✅ implementado |
 | `shipping.pickup` | ON | siempre | Retiro en el local (fallback si no hay credenciales) | ✅ implementado |
 
 ### Módulos de negocio
@@ -45,6 +45,7 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 | `wishlist` | ON | siempre (usa auth) | Favoritos por usuario, corazón en tarjetas, página dedicada | ✅ implementado |
 | `coupons` | OFF | env var | Códigos %/fijo, fechas, límite de uso; se aplican en checkout | ✅ implementado |
 | `orders_notifications` | ON* | si `NEXT_PUBLIC_WHATSAPP` o email config | Aviso al cliente y admin al crear pedido | ✅ implementado (WhatsApp) |
+| `order_shipped_notifications` | OFF* | `WHATSAPP_TOKEN` + `WHATSAPP_PHONE_ID` (Cloud API) o fallback a link wa.me | Aviso automático al cliente al generar la guía / pasar el pedido a enviado | ✅ implementado |
 
 ### Placeholders futuros (patrón a replicar)
 
@@ -79,5 +80,6 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 | `CORREO_ARGENTINO_EMAIL` / `PASSWORD` | Para `/users/validate` si no hay CUSTOMER_ID |
 | `CORREO_ARGENTINO_SENDER_CP` | Código postal de origen (obligatorio) |
 | `CORREO_ARGENTINO_PKG_DIMS` | Dimensiones por defecto del paquete `largo,ancho,alto` (cm) |
+| `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_ID` | WhatsApp Cloud API oficial de Meta: aviso automático al cliente al generar guía o pasar a enviado (si no están, se genera un link wa.me listo para el admin) |
 | `NEXT_PUBLIC_PICKUP_LOCATION` | Dirección del local para el retiro (fallback) |
 | Credenciales MP | (ya no se usan por env) — se cargan en Panel admin → Configuración → Mercado Pago |

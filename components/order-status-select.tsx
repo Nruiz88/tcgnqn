@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateOrderStatus } from '@/lib/actions'
 import type { OrderStatus } from '@/lib/types'
@@ -14,6 +15,7 @@ export default function OrderStatusSelect({
   currentStatus: OrderStatus
 }) {
   const router = useRouter()
+  const [notifyLink, setNotifyLink] = useState<string | null>(null)
 
   async function handleChange(status: OrderStatus) {
     const result = await updateOrderStatus(orderId, status)
@@ -21,6 +23,7 @@ export default function OrderStatusSelect({
       alert(result.error)
       return
     }
+    setNotifyLink(result?.notifyLink ?? null)
     router.refresh()
   }
 
@@ -52,6 +55,16 @@ export default function OrderStatusSelect({
           className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
         />
       </span>
+      {notifyLink && (
+        <a
+          href={notifyLink}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-green-700"
+        >
+          Enviar aviso de envío por WhatsApp
+        </a>
+      )}
     </>
   )
 }

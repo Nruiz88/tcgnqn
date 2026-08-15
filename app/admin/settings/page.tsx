@@ -1,6 +1,16 @@
 import { getSiteSettings } from '@/lib/data'
 import { getMercadoPagoCredentials } from '@/lib/mercadopago'
-import { updateMercadoPagoSettings, updateSiteSettings } from '@/lib/actions'
+import { getShippingSettingsRow } from '@/lib/shipping'
+import {
+  getNotificationSettingsRow,
+  hasWhatsAppApi,
+} from '@/lib/notifications'
+import {
+  updateMercadoPagoSettings,
+  updateNotificationSettings,
+  updateShippingSettings,
+  updateSiteSettings,
+} from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
 import type { SocialKey } from '@/lib/types'
 import {
@@ -90,12 +100,18 @@ const svgProps = {
   strokeLinejoin: 'round',
 } as const
 
+const mask = (v: string | null | undefined) =>
+  v ? `Guardado: ${v.slice(0, 6)}…${v.slice(-4)} — dejalo vacío para mantener` : undefined
+
 export default async function AdminSettingsPage() {
   const settings = await getSiteSettings()
   const mp = await getMercadoPagoCredentials()
   const mpTokenHint = mp?.accessToken
     ? `Guardado: ${mp.accessToken.slice(0, 12)}…${mp.accessToken.slice(-4)}`
     : null
+  const shipping = await getShippingSettingsRow()
+  const wa = await getNotificationSettingsRow()
+  const waApiOn = await hasWhatsAppApi()
 
   return (
     <div>
@@ -232,6 +248,191 @@ export default async function AdminSettingsPage() {
             </button>
           </form>
         </SectionCard>
+
+        <div className="xl:col-span-2">
+          <SectionCard title="Correo Argentino">
+            <form
+              action={async (formData: FormData) => {
+                'use server'
+                await updateShippingSettings(formData)
+                revalidatePath('/admin/settings')
+                revalidatePath('/checkout')
+                revalidatePath('/admin/orders')
+              }}
+              className="space-y-4"
+            >
+              <div className="rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-500 dark:bg-neutral-900/40">
+                <p>
+                  Estas credenciales se usan para cotizar envíos en el checkout,
+                  generar la guía desde el panel de pedidos y despachar. Si dejás
+                  un campo vacío se mantiene el valor guardado (o el de{' '}
+                  <code className="font-mono">.env.local</code> si nunca lo
+                  cargaste acá).
+                </p>
+                <p className="mt-1">
+                  ¿Dónde consigo los datos? Entrá a{' '}
+                  <a
+                    href="https://micorreo.correoargentino.com.ar"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-indigo-500 hover:text-indigo-400"
+                  >
+                    MiCorreo
+                  </a>{' '}
+                  con tu cuenta comercial → integración/API. El <em>código
+                  postal de origen</em> es el de la sucursal desde donde
+                  despachás.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelCls}>User token</label>
+                  <input
+                    name="correo_user_token"
+                    type="password"
+                    placeholder={mask(shipping?.correo_user_token)}
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Password token</label>
+                  <input
+                    name="correo_password_token"
+                    type="password"
+                    placeholder={mask(shipping?.correo_password_token)}
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Email de la cuenta MiCorreo</label>
+                  <input
+                    name="correo_email"
+                    type="email"
+                    defaultValue={shipping?.correo_email ?? ''}
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Password de la cuenta</label>
+                  <input
+                    name="correo_password"
+                    type="password"
+                    placeholder={mask(shipping?.correo_password)}
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>
+                    Customer ID{' '}
+                    <span className="text-xs font-normal text-neutral-400">
+                      (opcional, evita validar usuario)
+                    </span>
+                  </label>
+                  <input
+                    name="correo_customer_id"
+                    defaultValue={shipping?.correo_customer_id ?? ''}
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Código postal de origen</label>
+                  <input
+                    name="correo_sender_cp"
+                    defaultValue={shipping?.correo_sender_cp ?? ''}
+                    placeholder="Ej. 8300"
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className={btnPrimary}>
+                <Icon name="check" className="h-4 w-4" />
+                Guardar Correo Argentino
+              </button>
+            </form>
+          </SectionCard>
+        </div>
+
+        <div className="xl:col-span-2">
+          <SectionCard title="WhatsApp — avisos al cliente">
+            <form
+              action={async (formData: FormData) => {
+                'use server'
+                await updateNotificationSettings(formData)
+                revalidatePath('/admin/settings')
+              }}
+              className="space-y-4"
+            >
+              <div
+                className={`rounded-lg px-3 py-2 text-xs ${
+                  waApiOn
+                    ? 'bg-green-500/10 text-green-700 dark:text-green-400'
+                    : 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                }`}
+              >
+                {waApiOn
+                  ? '✅ Avisos automáticos activos: el cliente recibe el WhatsApp solo al despachar.'
+                  : 'Avisos manuales: se genera un link wa.me listo para que lo mandes vos. Cargá las credenciales para enviar automáticamente.'}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelCls}>
+                    Token de acceso (access token)
+                  </label>
+                  <input
+                    name="whatsapp_token"
+                    type="password"
+                    placeholder={mask(wa?.whatsapp_token)}
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>
+                    ID del número de teléfono (phone number ID)
+                  </label>
+                  <input
+                    name="whatsapp_phone_id"
+                    placeholder={mask(wa?.whatsapp_phone_id)}
+                    className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-500 dark:bg-neutral-900/40">
+                <p>
+                  <strong className="text-neutral-700 dark:text-neutral-300">
+                    ¿Dónde consigo estos datos?
+                  </strong>{' '}
+                  Entrá a{' '}
+                  <a
+                    href="https://developers.facebook.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-indigo-500 hover:text-indigo-400"
+                  >
+                    developers.facebook.com
+                  </a>{' '}
+                  → creá una app → agrega el producto <em>WhatsApp</em> → conectá
+                  tu número de negocio. Ahí vas a ver el{' '}
+                  <em>Phone number ID</em> y podés generar el{' '}
+                  <em>Access token</em> permanente.
+                </p>
+                <p className="mt-1">
+                  Dejá un campo vacío para mantener el valor guardado. El aviso
+                  también funciona sin esto, pero lo tenés que mandar vos desde
+                  el panel de pedidos.
+                </p>
+              </div>
+
+              <button type="submit" className={btnPrimary}>
+                <Icon name="check" className="h-4 w-4" />
+                Guardar WhatsApp
+              </button>
+            </form>
+          </SectionCard>
+        </div>
       </div>
     </div>
   )

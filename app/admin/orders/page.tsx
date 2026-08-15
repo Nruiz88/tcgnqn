@@ -1,6 +1,7 @@
 import { getAllOrders } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
 import { isEnabled } from '@/lib/modules'
+import { isCorreoArgentinoConfigured } from '@/lib/shipping'
 import { whatsappNumber } from '@/lib/whatsapp'
 import {
   ORDER_STATUS_LABELS,
@@ -9,6 +10,7 @@ import {
 } from '@/lib/orders'
 import { Icon, PageHeader, EmptyState } from '@/components/admin-ui'
 import OrderStatusSelect from '@/components/order-status-select'
+import ShippingLabelForm from '@/components/shipping-label-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +18,7 @@ export default async function AdminOrdersPage() {
   const orders = await getAllOrders()
   const waEnabled = isEnabled('orders_notifications')
   const storeNumber = whatsappNumber()
+  const correoEnabled = await isCorreoArgentinoConfigured()
 
   const pendingCount = orders.filter((o) => o.status === 'pending').length
   const revenue = orders
@@ -156,6 +159,11 @@ export default async function AdminOrdersPage() {
                   Notas: {order.notes}
                 </p>
               )}
+
+              {correoEnabled &&
+                order.shipping_method?.startsWith('correo_argentino') && (
+                  <ShippingLabelForm order={order} />
+                )}
 
               <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-200 pt-4">
                 <OrderStatusSelect
