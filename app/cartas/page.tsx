@@ -1,6 +1,14 @@
 import { getProducts, getGames } from '@/lib/data'
 import CardTile from '@/components/card-tile'
-import CatalogControls from '@/components/catalog-controls'
+import CatalogControls, {
+  type CollectionEntry,
+} from '@/components/catalog-controls'
+import {
+  POKEMON_ERAS,
+  pokemonSetByCode,
+  isPokemonSetKey,
+  findPokemonSet,
+} from '@/lib/pokemon-sets'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,31 +26,49 @@ export default async function CartasPage({
   const singles = allProducts.filter((p) => p.category?.slug === 'cartas')
   const activeGame = game ? games.find((g) => g.slug === game) : undefined
 
-  const sets: { name: string; gameName: string; count: number }[] = []
-  const setMap = new Map<string, { name: string; gameName: string; count: number }>()
-  for (const p of singles) {
+  const nonPokemon = singles.filter((p) => !findPokemonSet(p.set_name))
+
+  const collections: CollectionEntry[] = []
+  for (const era of POKEMON_ERAS) {
+    for (const s of era.sets) {
+      collections.push({
+        key: s.code,
+        name: s.name,
+        code: s.code,
+        group: era.era,
+        count: singles.filter((p) => findPokemonSet(p.set_name)?.code === s.code)
+          .length,
+      })
+    }
+  }
+
+  const setMap = new Map<string, CollectionEntry>()
+  for (const p of nonPokemon) {
     if (!p.set_name) continue
     const key = p.set_name.trim().toLowerCase()
     const existing = setMap.get(key)
     if (existing) existing.count += 1
     else {
-      const opt = {
+      setMap.set(key, {
+        key: p.set_name,
         name: p.set_name,
-        gameName: p.game?.name ?? 'Otros',
+        group: `${p.game?.name ?? 'Otros'} · Colecciones`,
         count: 1,
-      }
-      setMap.set(key, opt)
-      sets.push(opt)
+      })
     }
   }
-  sets.sort((a, b) => a.name.localeCompare(b.name))
+  const others = [...setMap.values()].sort((a, b) => a.name.localeCompare(b.name))
+  collections.push(...others)
 
   let filtered = singles
   if (activeGame) filtered = filtered.filter((p) => p.game?.slug === game)
   if (setParam) {
-    filtered = filtered.filter(
-      (p) => p.set_name?.trim().toLowerCase() === setParam.trim().toLowerCase(),
-    )
+    filtered = filtered.filter((p) => {
+      if (isPokemonSetKey(setParam)) {
+        return findPokemonSet(p.set_name)?.code === setParam
+      }
+      return p.set_name?.trim().toLowerCase() === setParam.trim().toLowerCase()
+    })
   }
 
   if (sort === 'name') {
@@ -53,11 +79,18 @@ export default async function CartasPage({
     filtered = [...filtered].sort((a, b) => a.price - b.price)
   }
 
-  const subtitle = setParam
-    ? `Cartas de la colección ${setParam}`
-    : activeGame
-      ? `Singles sueltos de ${activeGame.name} para tu colección`
-      : 'Cartas sueltas de todos los juegos, elegidas para tu binder'
+  const pokemonSet = setParam ? pokemonSetByCode(setParam) : undefined
+  const activeSetName = pokemonSet
+    ? `${pokemonSet.code} · ${pokemonSet.name}`
+    : setParam
+
+  const subtitle = pokemonSet
+    ? `Cartas de la colección ${pokemonSet.name} (${pokemonSet.code})`
+    : setParam
+      ? `Cartas de la colección ${setParam}`
+      : activeGame
+        ? `Singles sueltos de ${activeGame.name} para tu colección`
+        : 'Cartas sueltas de todos los juegos, elegidas para tu binder'
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
@@ -67,11 +100,13 @@ export default async function CartasPage({
             Singles
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            {setParam
-              ? setParam
-              : activeGame
-                ? `${activeGame.emoji} Cartas individuales · ${activeGame.name}`
-                : 'Cartas individuales'}
+            {pokemonSet
+              ? `${pokemonSet.name} (${pokemonSet.code})`
+              : setParam
+                ? setParam
+                : activeGame
+                  ? `${activeGame.emoji} Cartas individuales · ${activeGame.name}`
+                  : 'Cartas individuales'}
           </h1>
           <p className="mt-2 max-w-lg text-sm text-neutral-500 sm:text-base">
             {subtitle}
@@ -86,19 +121,22 @@ export default async function CartasPage({
           name: g.name,
           emoji: g.emoji,
         }))}
-        sets={sets}
+        collections={collections}
         game={game}
         set={setParam}
         sort={sort}
+        activeSetName={activeSetName}
       />
 
       {filtered.length === 0 ? (
         <p className="mt-16 rounded-2xl border border-dashed border-neutral-300 p-10 text-center text-sm text-neutral-500">
-          {setParam
-            ? `Todavía no hay cartas de la colección ${setParam}.`
-            : activeGame
-              ? `Todavía no hay cartas individuales de ${activeGame.name}.`
-              : 'Todavía no hay cartas individuales cargadas.'}
+          {pokemonSet
+            ? `Todavía no hay cartas de ${pokemonSet.name} (${pokemonSet.code}).`
+            : setParam
+              ? `Todavía no hay cartas de la colección ${setParam}.`
+              : activeGame
+                ? `Todavía no hay cartas individuales de ${activeGame.name}.`
+                : 'Todavía no hay cartas individuales cargadas.'}
         </p>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

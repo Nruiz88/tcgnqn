@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { createProduct, updateProduct } from '@/lib/actions'
 import { CONDITIONS, CONDITION_LABELS, LANGUAGES, LANGUAGE_LABELS, CARD_TYPES } from '@/lib/cards'
+import { ALL_POKEMON_SETS } from '@/lib/pokemon-sets'
 
 const inputCls =
   'mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none'
@@ -84,10 +85,16 @@ export default function CardForm({
           <label className={labelCls}>Set / Expansión</label>
           <input
             name="set_name"
-            placeholder="Evoluciones Brillantes"
+            list="pokemon-sets"
+            placeholder="Prismatic Evolutions"
             defaultValue={initial?.set_name ?? ''}
             className={inputCls}
           />
+          <datalist id="pokemon-sets">
+            {ALL_POKEMON_SETS.map((s) => (
+              <option key={s.code} value={s.name} />
+            ))}
+          </datalist>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4">
