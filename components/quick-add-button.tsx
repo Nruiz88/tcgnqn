@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useCart } from '@/lib/cart-context'
 import type { Product } from '@/lib/types'
 
-function CartIcon({ className }: { className?: string }) {
+export function CartIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
