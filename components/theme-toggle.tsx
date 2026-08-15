@@ -1,21 +1,26 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
+
+function subscribeTheme(cb: () => void) {
+  window.addEventListener('storage', cb)
+  return () => window.removeEventListener('storage', cb)
+}
+
+function getTheme() {
+  return document.documentElement.classList.contains('dark')
+}
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(true)
-
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains('dark'))
-  }, [])
+  const dark = useSyncExternalStore(subscribeTheme, getTheme, () => true)
 
   function toggle() {
     const next = !dark
-    setDark(next)
     document.documentElement.classList.toggle('dark', next)
     try {
       localStorage.setItem('theme', next ? 'dark' : 'light')
     } catch {}
+    window.dispatchEvent(new Event('storage'))
   }
 
   return (

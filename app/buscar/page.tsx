@@ -39,7 +39,7 @@ export default async function SearchPage({
           <div className="mt-16 text-center">
             <p className="text-3xl">🔍</p>
             <p className="mt-3 text-neutral-500">
-              No encontramos nada para "{query}".
+              No encontramos nada para “{query}”.
             </p>
             <Link href="/" className="mt-4 inline-block text-sm font-medium underline">
               Volver a la tienda

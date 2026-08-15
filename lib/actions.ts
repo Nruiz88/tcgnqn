@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import type { CartItem, OrderStatus } from '@/lib/types'
+import type { CartItem, OrderStatus, SiteSettings, SocialKey } from '@/lib/types'
 import { isEnabled } from '@/lib/modules'
 import { whatsappNumber, buildWhatsappLink, cartSummary } from '@/lib/whatsapp'
 import { quoteShipping } from '@/lib/shipping'
@@ -469,6 +469,29 @@ export async function toggleCoupon(id: string, active: boolean) {
 export async function deleteCoupon(id: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('coupons').delete().eq('id', id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+const SOCIAL_KEYS: SocialKey[] = [
+  'instagram',
+  'facebook',
+  'tiktok',
+  'x',
+  'youtube',
+  'discord',
+]
+
+export async function updateSiteSettings(formData: FormData) {
+  const supabase = await createClient()
+  const payload: Partial<SiteSettings> = {}
+  for (const key of SOCIAL_KEYS) {
+    const value = String(formData.get(key) ?? '').trim()
+    payload[key] = value || null
+  }
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ id: 1, ...payload }, { onConflict: 'id' })
   if (error) return { error: error.message }
   return { ok: true }
 }

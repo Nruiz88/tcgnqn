@@ -1,6 +1,14 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
-import type { Category, Coupon, Game, Order, OrderItem, Product } from '@/lib/types'
+import type {
+  Category,
+  Coupon,
+  Game,
+  Order,
+  OrderItem,
+  Product,
+  SiteSettings,
+} from '@/lib/types'
 
 export async function getAllProducts(): Promise<Product[]> {
   const supabase = await createClient()
@@ -157,5 +165,16 @@ export async function getAllOrders(): Promise<OrderWithItems[]> {
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (orders ?? []) as OrderWithItems[]
+}
+
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('site_settings')
+    .select('*')
+    .eq('id', 1)
+    .single()
+  if (error) return null
+  return data as SiteSettings
 }
 

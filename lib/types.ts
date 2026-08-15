@@ -86,3 +86,19 @@ export type Coupon = {
   expires_at: string | null
   active: boolean
 }
+
+export type SiteSettings = {
+  id: number
+  instagram: string | null
+  facebook: string | null
+  tiktok: string | null
+  x: string | null
+  youtube: string | null
+  discord: string | null
+  updated_at: string
+}
+
+export type SocialKey = keyof Pick<
+  SiteSettings,
+  'instagram' | 'facebook' | 'tiktok' | 'x' | 'youtube' | 'discord'
+>

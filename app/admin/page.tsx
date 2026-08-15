@@ -3,7 +3,6 @@ import { getAllProducts, getAllOrders } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
 import { toggleProduct } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
-import type { Product } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 

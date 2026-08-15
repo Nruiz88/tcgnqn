@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import InfoPage, { InfoSection } from '@/components/info-page'
 
 export const metadata = {
@@ -64,12 +65,12 @@ export default function PrivacidadPage() {
         <p>
           Si tenés dudas sobre esta política, escribinos por WhatsApp desde la
           página de{' '}
-          <a
+          <Link
             href="/contacto"
             className="font-medium text-indigo-600 hover:underline"
           >
             contacto
-          </a>
+          </Link>
           .
         </p>
       </InfoSection>

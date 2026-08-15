@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,17 +46,7 @@ export default function RootLayout({
           <div className="flex min-h-screen flex-col">
             <Navbar />
             <main className="flex-1">{children}</main>
-            <footer className="border-t border-neutral-200 bg-surface">
-              <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">🃏</span>
-                  <span className="text-sm font-semibold">TCG NQN</span>
-                </div>
-                <p className="text-xs text-neutral-500">
-                  Cartas y accesorios coleccionables · Pagos coordinados por WhatsApp
-                </p>
-              </div>
-            </footer>
+            <Footer />
           </div>
           {modal}
         </CartProvider>
