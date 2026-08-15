@@ -150,7 +150,7 @@ export async function getMyOrders(): Promise<OrderWithItems[]> {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, product:products(*, category:categories(*), game:games(*)))')
+    .select('*, items:order_items(*, product:products(*, category:categories(*), game:games(*)))')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
@@ -161,7 +161,7 @@ export async function getAllOrders(): Promise<OrderWithItems[]> {
   const supabase = await createClient()
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, product:products(*, category:categories(*), game:games(*)))')
+    .select('*, items:order_items(*, product:products(*, category:categories(*), game:games(*)))')
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (orders ?? []) as OrderWithItems[]

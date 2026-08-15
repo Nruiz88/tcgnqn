@@ -1,11 +1,10 @@
 import { getAllOrders } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
-import { updateOrderStatus } from '@/lib/actions'
-import { revalidatePath } from 'next/cache'
 import type { OrderStatus } from '@/lib/types'
 import { isEnabled } from '@/lib/modules'
 import { whatsappNumber } from '@/lib/whatsapp'
 import { Icon, PageHeader, EmptyState } from '@/components/admin-ui'
+import OrderStatusSelect from '@/components/order-status-select'
 
 export const dynamic = 'force-dynamic'
 
@@ -164,38 +163,10 @@ export default async function AdminOrdersPage() {
               )}
 
               <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-200 pt-4">
-                <form
-                  action={async (formData: FormData) => {
-                    'use server'
-                    const status = String(
-                      formData.get('status'),
-                    ) as OrderStatus
-                    await updateOrderStatus(order.id, status)
-                    revalidatePath('/admin/orders')
-                  }}
-                >
-                  <label className="mr-2 text-xs font-medium text-neutral-500">
-                    Estado
-                  </label>
-                  <span className="relative inline-block align-middle">
-                    <select
-                      name="status"
-                      defaultValue={order.status}
-                      onChange={(e) => e.target.closest('form')?.requestSubmit()}
-                      className="appearance-none rounded-lg border border-neutral-300 bg-transparent py-1.5 pl-3 pr-9 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                    >
-                      {(Object.keys(STATUS_LABELS) as OrderStatus[]).map((s) => (
-                        <option key={s} value={s}>
-                          {STATUS_LABELS[s]}
-                        </option>
-                      ))}
-                    </select>
-                    <Icon
-                      name="chevronDown"
-                      className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500"
-                    />
-                  </span>
-                </form>
+                <OrderStatusSelect
+                  orderId={order.id}
+                  currentStatus={order.status}
+                />
                 {waEnabled && order.shipping_phone && storeNumber && (
                   <a
                     href={`https://wa.me/${order.shipping_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${order.shipping_name}! Tu pedido en TCG NQN está ${STATUS_LABELS[order.status].toLowerCase()}.`)}`}
