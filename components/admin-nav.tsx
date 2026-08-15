@@ -35,6 +35,14 @@ const iconPaths = {
       <path d="M16 10a4 4 0 0 1-8 0" />
     </>
   ),
+  cards: (
+    <>
+      <path d="M2 5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Z" />
+      <path d="M7 8h6" />
+      <path d="M7 12h10" />
+      <path d="M7 16h4" />
+    </>
+  ),
   categories: (
     <>
       <path d="M12.6 2.6A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .6 1.4l8 8a2 2 0 0 0 2.8 0l7-7a2 2 0 0 0 0-2.8Z" />
@@ -67,6 +75,7 @@ type NavItem = {
 function items(): NavItem[] {
   const nav: NavItem[] = [
     { href: '/admin', label: 'Productos', icon: 'products' },
+    { href: '/admin/cartas', label: 'Cartas', icon: 'cards' },
     { href: '/admin/orders', label: 'Pedidos', icon: 'orders' },
     { href: '/admin/categories', label: 'Categorías', icon: 'categories' },
     { href: '/admin/games', label: 'Juegos', icon: 'games' },

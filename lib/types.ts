@@ -35,6 +35,10 @@ export type Product = {
   category?: Category | null
   game_id: string | null
   game?: Game | null
+  condition: string | null
+  language: string | null
+  set_name: string | null
+  card_type: string | null
   created_at: string
 }
 

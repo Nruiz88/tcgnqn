@@ -227,6 +227,10 @@ export async function createProduct(formData: FormData) {
   const image_url = String(formData.get('image_url') ?? '')
   const category_id = String(formData.get('category_id') ?? '')
   const game_id = String(formData.get('game_id') ?? '')
+  const condition = String(formData.get('condition') ?? '')
+  const language = String(formData.get('language') ?? '')
+  const set_name = String(formData.get('set_name') ?? '')
+  const card_type = String(formData.get('card_type') ?? '')
 
   const { error } = await supabase.from('products').insert({
     name,
@@ -236,6 +240,10 @@ export async function createProduct(formData: FormData) {
     image_url: image_url || null,
     category_id: category_id || null,
     game_id: game_id || null,
+    condition: condition || null,
+    language: language || null,
+    set_name: set_name || null,
+    card_type: card_type || null,
     active: true,
   })
   if (error) return { error: error.message }
@@ -251,6 +259,10 @@ export async function updateProduct(id: string, formData: FormData) {
   const image_url = String(formData.get('image_url') ?? '')
   const category_id = String(formData.get('category_id') ?? '')
   const game_id = String(formData.get('game_id') ?? '')
+  const condition = String(formData.get('condition') ?? '')
+  const language = String(formData.get('language') ?? '')
+  const set_name = String(formData.get('set_name') ?? '')
+  const card_type = String(formData.get('card_type') ?? '')
 
   const { error } = await supabase
     .from('products')
@@ -262,6 +274,10 @@ export async function updateProduct(id: string, formData: FormData) {
       image_url: image_url || null,
       category_id: category_id || null,
       game_id: game_id || null,
+      condition: condition || null,
+      language: language || null,
+      set_name: set_name || null,
+      card_type: card_type || null,
     })
     .eq('id', id)
   if (error) return { error: error.message }
@@ -274,6 +290,13 @@ export async function toggleProduct(id: string, active: boolean) {
     .from('products')
     .update({ active })
     .eq('id', id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+export async function deleteProduct(id: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('products').delete().eq('id', id)
   if (error) return { error: error.message }
   return { ok: true }
 }

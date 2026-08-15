@@ -6,6 +6,7 @@ Guía de verificación para el panel de administración.
 
 - [x] Layout `/admin` con auth + rol admin (redirige a `/login` o `/`)
 - [x] Sidebar con navegación e íconos + header "Volver a la tienda"
+- [x] Sección Cartas en admin: `/admin/cartas` (CRUD) con datos TCG (condición NM/LP/MP/HP/DMG, idioma EN/JP/ES, rareza, set)
 - [x] Dashboard con KPIs (productos activos, stock bajo, pedidos pendientes, ingresos)
 - [x] Lista de productos: imagen, nombre, precio, stock, badge Oculto
 - [x] Botones Publicar/Ocultar y Editar por producto

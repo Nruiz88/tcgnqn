@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getProduct } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
 import AddToCartButton from '@/components/add-to-cart-button'
+import { CONDITION_LABELS, LANGUAGE_LABELS } from '@/lib/cards'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,6 +47,41 @@ export default async function ProductPage({
               {product.description}
             </p>
           )}
+          {product.condition ||
+          product.language ||
+          product.set_name ||
+          product.card_type ? (
+            <dl className="mt-6 space-y-2 rounded-2xl border border-neutral-200 bg-surface p-5 text-sm">
+              {product.set_name && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-neutral-500">Set / Expansión</dt>
+                  <dd className="font-medium">{product.set_name}</dd>
+                </div>
+              )}
+              {product.card_type && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-neutral-500">Rareza</dt>
+                  <dd className="font-medium">{product.card_type}</dd>
+                </div>
+              )}
+              {product.condition && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-neutral-500">Condición</dt>
+                  <dd className="font-medium">
+                    {product.condition} · {CONDITION_LABELS[product.condition]}
+                  </dd>
+                </div>
+              )}
+              {product.language && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-neutral-500">Idioma</dt>
+                  <dd className="font-medium">
+                    {LANGUAGE_LABELS[product.language]} ({product.language})
+                  </dd>
+                </div>
+              )}
+            </dl>
+          ) : null}
           <div className="mt-4">
             {product.stock > 0 ? (
               <p className="text-sm text-neutral-500">

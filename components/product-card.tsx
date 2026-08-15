@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Product } from '@/lib/types'
 import { formatPrice } from '@/lib/format'
 import { isEnabled } from '@/lib/modules'
+import { LANGUAGE_LABELS, conditionColor } from '@/lib/cards'
 import WishlistButton from './wishlist-button'
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -43,6 +44,17 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
         <div className="p-4">
           <h3 className="truncate text-sm font-medium">{product.name}</h3>
+          {product.condition && (
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
+              <span
+                className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${conditionColor(product.condition)}`}
+              >
+                {product.condition}
+              </span>
+              {product.language &&
+                (LANGUAGE_LABELS[product.language] ?? product.language)}
+            </p>
+          )}
           <p className="mt-1 text-sm font-semibold">{formatPrice(product.price)}</p>
         </div>
       </Link>
