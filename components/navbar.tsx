@@ -7,7 +7,6 @@ import { useState } from 'react'
 import { useCart } from '@/lib/cart-context'
 import { usePathname } from 'next/navigation'
 import { isEnabled } from '@/lib/modules'
-import ThemeToggle from './theme-toggle'
 
 export default function Navbar() {
   const { count } = useCart()
@@ -48,7 +47,6 @@ export default function Navbar() {
           </div>
         </form>
         <div className="flex items-center gap-4 sm:gap-5">
-          <ThemeToggle />
           <Link
             href="/"
             className={`text-sm font-medium ${
