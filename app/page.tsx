@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { getProducts, getCategories, getGames } from '@/lib/data'
+import type { Product } from '@/lib/types'
 import ProductCard from '@/components/product-card'
 import CardTile from '@/components/card-tile'
 import { isCard } from '@/lib/cards'
+import { POKEMON_ERAS, findPokemonSet } from '@/lib/pokemon-sets'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,6 +76,45 @@ export default async function Home({
 
   const featured = products.slice(0, 8)
   const latest = allProducts.slice().reverse().slice(0, 4)
+
+  // Colecciones de singles, organizadas como filas de cartas (estilo PokeArgentum)
+  const singles = allProducts.filter((p) => p.category?.slug === 'cartas')
+  const collections: {
+    key: string
+    name: string
+    group: string
+    cards: Product[]
+  }[] = []
+  for (const era of POKEMON_ERAS) {
+    for (const s of era.sets) {
+      const cards = singles.filter(
+        (p) => findPokemonSet(p.set_name)?.code === s.code,
+      )
+      if (cards.length === 0) continue
+      collections.push({ key: s.code, name: s.name, group: era.era, cards })
+    }
+  }
+  const otherCollections = new Map<
+    string,
+    { name: string; group: string; cards: Product[] }
+  >()
+  for (const p of singles) {
+    if (findPokemonSet(p.set_name) || !p.set_name) continue
+    const key = p.set_name.trim().toLowerCase()
+    const existing = otherCollections.get(key)
+    if (existing) existing.cards.push(p)
+    else
+      otherCollections.set(key, {
+        name: p.set_name,
+        group: `${p.game?.name ?? 'Otros'} · Colecciones`,
+        cards: [p],
+      })
+  }
+  for (const [key, c] of otherCollections) {
+    collections.push({ key, name: c.name, group: c.group, cards: c.cards })
+  }
+  collections.sort((a, b) => b.cards.length - a.cards.length)
+  const featuredCollections = collections.slice(0, 6)
 
   return (
     <div>
@@ -363,6 +404,49 @@ export default async function Home({
           </div>
         </section>
       )}
+
+      {/* Singles: colecciones con filas de cartas */}
+      {!activeGame &&
+        !activeCategory &&
+        featuredCollections.length > 0 && (
+          <section className="mx-auto max-w-6xl px-4 pb-20">
+            <SectionHeader
+              kicker="Singles"
+              title="Colecciones de cartas"
+              subtitle="Explorá las cartas disponibles de cada colección"
+              href="/cartas"
+            />
+            <div className="mt-10 space-y-12">
+              {featuredCollections.map((coll) => (
+                <div key={coll.key} className="space-y-4">
+                  <div className="flex items-end justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                        {coll.group}
+                      </p>
+                      <h3 className="mt-1 truncate font-display text-xl font-bold tracking-tight sm:text-2xl">
+                        {coll.name}
+                      </h3>
+                    </div>
+                    <Link
+                      href={`/cartas?set=${encodeURIComponent(coll.key)}`}
+                      className="shrink-0 text-sm font-semibold text-indigo-600 transition hover:text-indigo-500"
+                    >
+                      Ver todo ({coll.cards.length}) →
+                    </Link>
+                  </div>
+                  <div className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-4 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {coll.cards.slice(0, 10).map((card) => (
+                      <div key={card.id} className="w-44 shrink-0 snap-start">
+                        <CardTile product={card} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
       {/* CTA final */}
       <section className="mx-auto max-w-6xl px-4 pb-20">
