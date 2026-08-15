@@ -1,12 +1,19 @@
 import { getGames } from '@/lib/data'
 import { createGame, updateGame, deleteGame } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
+import {
+  Icon,
+  PageHeader,
+  EmptyState,
+  SectionCard,
+  inputCls,
+  labelCls,
+  btnPrimary,
+  btnSecondary,
+  btnDanger,
+} from '@/components/admin-ui'
 
 export const dynamic = 'force-dynamic'
-
-const inputCls =
-  'mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none'
-const labelCls = 'text-xs font-medium text-neutral-500'
 
 function ImageInput({
   name,
@@ -29,8 +36,8 @@ function ImageInput({
             className="h-14 w-14 shrink-0 rounded-xl border border-neutral-200 object-cover"
           />
         ) : (
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-xl">
-            {emoji ?? '🖼️'}
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-xl dark:bg-neutral-800/60">
+            {emoji ?? <Icon name="layers" className="h-6 w-6 text-neutral-400" />}
           </span>
         )}
         <div className="min-w-40 flex-1 space-y-2">
@@ -38,13 +45,13 @@ function ImageInput({
             type="file"
             name="image"
             accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-            className="block w-full text-sm text-neutral-500 file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-neutral-700 hover:file:bg-neutral-200"
+            className="block w-full text-sm text-neutral-500 file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-neutral-700 hover:file:bg-neutral-200 dark:file:bg-neutral-800 dark:file:text-neutral-300"
           />
           <input
             name="image_url"
             defaultValue={imageUrl ?? ''}
             placeholder="o pegá una URL https://..."
-            className="w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-sm"
+            className="w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-1.5 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           />
         </div>
       </div>
@@ -57,26 +64,26 @@ export default async function AdminGamesPage() {
 
   return (
     <div>
-      <div>
-        <h2 className="font-display text-xl font-bold tracking-tight">
-          Juegos TCG
-        </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Los juegos que aparecen en la tienda y en el marquee. Podés subir una
-          imagen o pegar una URL.
-        </p>
-      </div>
+      <PageHeader
+        icon="layers"
+        title="Juegos TCG"
+        description="Los juegos que aparecen en la tienda y en el marquee"
+      />
 
-      <form
-        action={async (formData: FormData) => {
-          'use server'
-          await createGame(formData)
-          revalidatePath('/admin/games')
-          revalidatePath('/', 'layout')
-        }}
-        className="mt-6 rounded-2xl border border-neutral-200 bg-surface p-5"
+      {/* Nuevo juego */}
+      <SectionCard
+        title="Nuevo juego"
+        description="Podés subir una imagen o pegar una URL."
       >
-        <div className="grid gap-4 sm:grid-cols-2">
+        <form
+          action={async (formData: FormData) => {
+            'use server'
+            await createGame(formData)
+            revalidatePath('/admin/games')
+            revalidatePath('/', 'layout')
+          }}
+          className="grid gap-4 sm:grid-cols-2"
+        >
           <div>
             <label className={labelCls}>Emoji</label>
             <input name="emoji" placeholder="⚡" className={inputCls} />
@@ -101,20 +108,23 @@ export default async function AdminGamesPage() {
           <div className="sm:col-span-2">
             <ImageInput name="Nuevo juego" />
           </div>
-        </div>
-        <button
-          type="submit"
-          className="mt-5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
-        >
-          + Crear
-        </button>
-      </form>
+          <div className="sm:col-span-2">
+            <button type="submit" className={btnPrimary}>
+              <Icon name="plus" className="h-4 w-4" />
+              Crear
+            </button>
+          </div>
+        </form>
+      </SectionCard>
 
+      {/* Listado */}
       <div className="mt-6 space-y-3">
         {games.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-neutral-300 p-10 text-center text-sm text-neutral-500">
-            No hay juegos todavía.
-          </p>
+          <EmptyState
+            icon="layers"
+            title="No hay juegos todavía"
+            description="Creá el primer juego para que aparezca en la tienda."
+          />
         )}
         {games.map((g) => (
           <form
@@ -125,55 +135,75 @@ export default async function AdminGamesPage() {
               revalidatePath('/admin/games')
               revalidatePath('/', 'layout')
             }}
-            className="rounded-2xl border border-neutral-200 bg-surface p-4 transition hover:border-neutral-300"
+            className="rounded-2xl border border-neutral-200 bg-surface p-5 transition hover:border-neutral-300"
           >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className={labelCls}>Emoji</label>
-                <input
-                  name="emoji"
-                  defaultValue={g.emoji ?? ''}
-                  className={inputCls}
+            <div className="flex items-start gap-4">
+              {g.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={g.image_url}
+                  alt={g.name}
+                  className="h-16 w-16 shrink-0 rounded-xl border border-neutral-200 object-cover"
                 />
-              </div>
-              <div>
-                <label className={labelCls}>Nombre</label>
-                <input
-                  name="name"
-                  defaultValue={g.name}
-                  required
-                  className={inputCls}
-                />
-                <p className="mt-1 text-xs text-neutral-400">/{g.slug}</p>
-              </div>
-              <div className="sm:col-span-2">
-                <label className={labelCls}>Color gradiente</label>
-                <input
-                  name="color"
-                  defaultValue={g.color ?? ''}
-                  placeholder="from-... to-..."
-                  className={inputCls}
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <ImageInput name={g.name} emoji={g.emoji} imageUrl={g.image_url} />
+              ) : (
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-2xl dark:bg-neutral-800/60">
+                  {g.emoji ?? <Icon name="layers" className="h-7 w-7 text-neutral-400" />}
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className={labelCls}>Emoji</label>
+                    <input
+                      name="emoji"
+                      defaultValue={g.emoji ?? ''}
+                      className={inputCls}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Nombre</label>
+                    <input
+                      name="name"
+                      defaultValue={g.name}
+                      required
+                      className={inputCls}
+                    />
+                    <p className="mt-1 text-xs text-neutral-400">/{g.slug}</p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className={labelCls}>Color gradiente</label>
+                    <input
+                      name="color"
+                      defaultValue={g.color ?? ''}
+                      placeholder="from-... to-..."
+                      className={inputCls}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <ImageInput
+                      name={g.name}
+                      emoji={g.emoji}
+                      imageUrl={g.image_url}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-end gap-2">
-              <button
-                type="submit"
-                className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium transition hover:bg-neutral-100"
-              >
+            <div className="mt-4 flex items-center justify-end gap-2 border-t border-neutral-200 pt-4">
+              <button type="submit" className={btnSecondary}>
+                <Icon name="check" className="h-3.5 w-3.5" />
                 Guardar
               </button>
               <button
+                title="Borrar juego"
                 formAction={async () => {
                   'use server'
                   await deleteGame(g.id)
                   revalidatePath('/admin/games')
                 }}
-                className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                className={btnDanger}
               >
+                <Icon name="trash" className="h-3.5 w-3.5" />
                 Borrar
               </button>
             </div>

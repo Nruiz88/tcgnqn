@@ -1,19 +1,23 @@
+import Link from 'next/link'
 import { getCategories, getGames } from '@/lib/data'
 import ProductForm from '@/components/product-form'
+import { Icon, PageHeader, btnSecondary } from '@/components/admin-ui'
 
 export default async function NewProductPage() {
   const [categories, games] = await Promise.all([getCategories(), getGames()])
 
   return (
     <div>
-      <div>
-        <h2 className="font-display text-xl font-bold tracking-tight">
-          Nuevo producto
-        </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Completá los datos para sumarlo al catálogo
-        </p>
-      </div>
+      <PageHeader
+        icon="plus"
+        title="Nuevo producto"
+        description="Completá los datos para sumarlo al catálogo"
+      >
+        <Link href="/admin" className={btnSecondary}>
+          <Icon name="arrowLeft" className="h-4 w-4" />
+          Volver
+        </Link>
+      </PageHeader>
       <div className="mt-6">
         <ProductForm
           action="create"

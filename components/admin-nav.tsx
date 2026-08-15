@@ -3,124 +3,121 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { isEnabled } from '@/lib/modules'
-
-function Icon({ path }: { path: React.ReactNode }) {
-  return (
-    <svg
-      className="h-[18px] w-[18px] shrink-0"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {path}
-    </svg>
-  )
-}
-
-const iconPaths = {
-  products: (
-    <>
-      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-      <path d="m3.3 7 8.7 5 8.7-5" />
-      <path d="M12 22V12" />
-    </>
-  ),
-  orders: (
-    <>
-      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-      <path d="M3 6h18" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
-    </>
-  ),
-  cards: (
-    <>
-      <path d="M2 5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Z" />
-      <path d="M7 8h6" />
-      <path d="M7 12h10" />
-      <path d="M7 16h4" />
-    </>
-  ),
-  categories: (
-    <>
-      <path d="M12.6 2.6A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .6 1.4l8 8a2 2 0 0 0 2.8 0l7-7a2 2 0 0 0 0-2.8Z" />
-      <circle cx="7" cy="7" r="1" fill="currentColor" stroke="none" />
-    </>
-  ),
-  games: (
-    <>
-      <path d="m12 2 8 4.5-8 4.5-8-4.5Z" />
-      <path d="m4 11.5 8 4.5 8-4.5" />
-      <path d="m4 16.5 8 4.5 8-4.5" />
-    </>
-  ),
-  coupons: (
-    <>
-      <path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z" />
-      <path d="M13 5v2" />
-      <path d="M13 11v2" />
-      <path d="M13 17v2" />
-    </>
-  ),
-  social: (
-    <>
-      <circle cx="18" cy="5" r="3" />
-      <circle cx="6" cy="12" r="3" />
-      <circle cx="18" cy="19" r="3" />
-      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-    </>
-  ),
-}
+import { Icon, type IconName } from '@/components/admin-ui'
 
 type NavItem = {
   href: string
   label: string
-  icon: keyof typeof iconPaths
+  icon: IconName
 }
 
-function items(): NavItem[] {
-  const nav: NavItem[] = [
-    { href: '/admin', label: 'Productos', icon: 'products' },
-    { href: '/admin/cartas', label: 'Cartas', icon: 'cards' },
-    { href: '/admin/orders', label: 'Pedidos', icon: 'orders' },
-    { href: '/admin/categories', label: 'Categorías', icon: 'categories' },
-    { href: '/admin/games', label: 'Juegos', icon: 'games' },
+type NavGroup = {
+  label: string
+  items: NavItem[]
+}
+
+function groups(): NavGroup[] {
+  const nav: NavGroup[] = [
+    {
+      label: 'Catálogo',
+      items: [
+        { href: '/admin', label: 'Productos', icon: 'package' },
+        { href: '/admin/cartas', label: 'Cartas', icon: 'fileText' },
+        { href: '/admin/categories', label: 'Categorías', icon: 'tag' },
+        { href: '/admin/games', label: 'Juegos', icon: 'layers' },
+      ],
+    },
+    {
+      label: 'Ventas',
+      items: [{ href: '/admin/orders', label: 'Pedidos', icon: 'shoppingBag' }],
+    },
   ]
   if (isEnabled('coupons')) {
-    nav.push({ href: '/admin/coupons', label: 'Cupones', icon: 'coupons' })
+    nav.push({
+      label: 'Promociones',
+      items: [{ href: '/admin/coupons', label: 'Cupones', icon: 'ticket' }],
+    })
   }
-  nav.push({ href: '/admin/settings', label: 'Redes sociales', icon: 'social' })
+  nav.push({
+    label: 'Configuración',
+    items: [{ href: '/admin/settings', label: 'Redes sociales', icon: 'share' }],
+  })
   return nav
 }
 
 export default function AdminNav() {
   const pathname = usePathname()
-  const nav = items()
+  const nav = groups()
 
   return (
-    <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-neutral-200 bg-surface p-2 lg:flex-col lg:overflow-visible">
-      {nav.map((item) => {
-        const active =
-          pathname === item.href ||
-          (item.href !== '/admin' && pathname.startsWith(item.href))
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-              active
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
-            }`}
-          >
-            <Icon path={iconPaths[item.icon]} />
-            {item.label}
-          </Link>
-        )
-      })}
+    <nav className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-surface p-3 shadow-sm">
+      {/* Marca */}
+      <Link
+        href="/admin"
+        className="mb-2 hidden items-center gap-3 rounded-xl px-2 pb-3 pt-1 lg:flex"
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 font-display text-lg font-bold text-white shadow-sm shadow-indigo-500/30">
+          T
+        </span>
+        <span className="min-w-0">
+          <span className="block font-display text-sm font-bold tracking-tight">
+            TCG NQN
+          </span>
+          <span className="block text-[11px] text-neutral-500">
+            Panel de administración
+          </span>
+        </span>
+      </Link>
+
+      {/* Navegación */}
+      <div className="flex gap-1 overflow-x-auto pb-1 lg:flex-1 lg:flex-col lg:gap-0 lg:overflow-visible lg:pb-0">
+        {nav.map((group, i) => (
+          <div key={group.label} className="contents lg:block">
+            {i > 0 && (
+              <span
+                aria-hidden
+                className="mx-1 w-px shrink-0 self-stretch bg-neutral-200 lg:hidden"
+              />
+            )}
+            <p className="hidden px-3 pb-1.5 pt-4 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 lg:block">
+              {group.label}
+            </p>
+            <div className="flex shrink-0 gap-1 lg:flex-col lg:gap-0.5">
+              {group.items.map((item) => {
+                const active =
+                  pathname === item.href ||
+                  (item.href !== '/admin' && pathname.startsWith(item.href))
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium transition lg:whitespace-normal ${
+                      active
+                        ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/25'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800/50'
+                    }`}
+                  >
+                    <Icon name={item.icon} className="h-[18px] w-[18px] shrink-0" />
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Pie: volver a la tienda (solo escritorio) */}
+      <div className="mt-auto hidden border-t border-neutral-200 pt-3 lg:block">
+        <Link
+          href="/"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800/50"
+        >
+          <Icon name="arrowLeft" className="h-[18px] w-[18px] shrink-0" />
+          Volver a la tienda
+        </Link>
+      </div>
     </nav>
   )
 }

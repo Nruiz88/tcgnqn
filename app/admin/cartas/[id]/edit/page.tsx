@@ -1,7 +1,9 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getCategories, getGames } from '@/lib/data'
 import CardForm from '@/components/card-form'
+import { Icon, PageHeader, btnSecondary } from '@/components/admin-ui'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,14 +25,16 @@ export default async function EditCardPage({
 
   return (
     <div>
-      <div>
-        <h2 className="font-display text-xl font-bold tracking-tight">
-          Editar carta
-        </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Actualizá los datos de la carta
-        </p>
-      </div>
+      <PageHeader
+        icon="pencil"
+        title="Editar carta"
+        description="Actualizá los datos de la carta"
+      >
+        <Link href="/admin/cartas" className={btnSecondary}>
+          <Icon name="arrowLeft" className="h-4 w-4" />
+          Volver
+        </Link>
+      </PageHeader>
       <div className="mt-6">
         <CardForm
           action="update"
