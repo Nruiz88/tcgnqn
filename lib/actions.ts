@@ -4,9 +4,14 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { CartItem, OrderStatus, SiteSettings, SocialKey } from '@/lib/types'
 import { isEnabled } from '@/lib/modules'
-import { whatsappNumber, buildWhatsappLink, cartSummary } from '@/lib/whatsapp'
+import { whatsappNumber, buildWhatsappLink } from '@/lib/whatsapp'
 import { quoteShipping } from '@/lib/shipping'
 import type { ShippingQuote } from '@/lib/shipping'
+import {
+  createPreference,
+  getMercadoPagoCredentials,
+  getPayment,
+} from '@/lib/mercadopago'
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient()
@@ -117,12 +122,30 @@ export async function quoteShippingForCheckout(
   }))
 }
 
-export async function createOrder(formData: FormData) {
+type ComputedOrder = {
+  cart: CartItem[]
+  total: number
+  discount: number
+  shippingMethod: string
+  shippingLabel: string
+  shippingPrice: number
+  shippingCp: string
+  name: string
+  phone: string
+  address: string
+  notes: string
+  priceMap: Map<string, number>
+  nameMap: Map<string, string>
+}
+
+type ComputedOrderResult = { error: string } | ComputedOrder
+
+/**
+ * Valida el carrito, aplica cupón y recotiza el envío en el server
+ * (no se confía en ningún valor enviado por el cliente).
+ */
+async function computeOrder(formData: FormData): Promise<ComputedOrderResult> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
   const name = String(formData.get('name') ?? '')
   const phone = String(formData.get('phone') ?? '')
@@ -145,7 +168,7 @@ export async function createOrder(formData: FormData) {
     .in('id', productIds)
   if (productsError || !products) return { error: 'Error de productos' }
 
-  const priceMap = new Map(products.map((p) => [p.id, p.price]))
+  const priceMap = new Map(products.map((p) => [p.id, Number(p.price)]))
   const nameMap = new Map(products.map((p) => [p.id, p.name]))
   let total = cart.reduce(
     (acc, i) => acc + (priceMap.get(i.product.id) ?? 0) * i.quantity,
@@ -203,6 +226,88 @@ export async function createOrder(formData: FormData) {
     total += shippingPrice
   }
 
+  return {
+    cart,
+    total,
+    discount,
+    shippingMethod,
+    shippingLabel,
+    shippingPrice,
+    shippingCp,
+    name,
+    phone,
+    address,
+    notes,
+    priceMap,
+    nameMap,
+  }
+}
+
+async function notifyOrder(
+  order: {
+    id: string
+    shipping_name: string
+    shipping_phone: string
+    shipping_address: string
+    shipping_label: string | null
+    shipping_price: number
+    total: number
+  },
+  items: { product_name?: string | null; quantity: number; price: number }[],
+) {
+  if (!isEnabled('orders_notifications')) return
+  const number = whatsappNumber()
+  if (!number) return
+  const summary = items
+    .map((i) => `• ${i.product_name ?? 'Producto'} x${i.quantity} (${i.price})`)
+    .join('\n')
+  const msg =
+    `Nuevo pedido #${order.id.slice(0, 8)}\n` +
+    `${order.shipping_name}\n${order.shipping_phone}\n${order.shipping_address}\n` +
+    `Envío: ${order.shipping_label}${
+      order.shipping_price > 0 ? ` (${order.shipping_price})` : ''
+    }\n` +
+    `\n${summary}\n` +
+    `Total: ${order.total}`
+  const link = buildWhatsappLink(msg)
+  // Log del link para el admin (o integrar envío automático si aplica)
+  console.log('WA notification:', link)
+}
+
+export async function createOrder(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const computed = await computeOrder(formData)
+  if ('error' in computed) return { error: computed.error }
+
+  const {
+    cart,
+    total,
+    discount,
+    shippingMethod,
+    shippingLabel,
+    shippingPrice,
+    shippingCp,
+    name,
+    phone,
+    address,
+    notes,
+    priceMap,
+    nameMap,
+  } = computed
+  const rawMethod = String(formData.get('payment_method') ?? '')
+    .trim()
+    .toLowerCase()
+  const paymentMethod = ['transferencia', 'whatsapp', 'mercadopago'].includes(
+    rawMethod,
+  )
+    ? rawMethod
+    : 'manual'
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -210,6 +315,7 @@ export async function createOrder(formData: FormData) {
       total,
       discount,
       status: 'pending',
+      payment_method: paymentMethod,
       shipping_name: name,
       shipping_phone: phone,
       shipping_address: address,
@@ -241,24 +347,179 @@ export async function createOrder(formData: FormData) {
     })
   }
 
-  if (isEnabled('orders_notifications')) {
-    const number = whatsappNumber()
-    if (number) {
-      const msg =
-        `Nuevo pedido #${order.id.slice(0, 8)}\n` +
-        `${name}\n${phone}\n${address}\n` +
-        `Envío: ${shippingLabel}${
-          shippingPrice > 0 ? ` (${shippingPrice})` : ''
-        }\n` +
-        `\n${cartSummary(cart)}\n` +
-        `Total: ${total}`
-      const link = buildWhatsappLink(msg)
-      // Log del link para el admin (o integrar envío automático si aplica)
-      console.log('WA notification:', link)
-    }
-  }
+  await notifyOrder(
+    order,
+    cart.map((i) => ({
+      product_name: i.product.name,
+      quantity: i.quantity,
+      price: i.product.price,
+    })),
+  )
 
   redirect(`/order-confirmed?order=${order.id}`)
+}
+
+export async function createMercadoPagoOrder(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const computed = await computeOrder(formData)
+  if ('error' in computed) return { error: computed.error }
+
+  const {
+    cart,
+    total,
+    discount,
+    shippingMethod,
+    shippingLabel,
+    shippingPrice,
+    shippingCp,
+    name,
+    phone,
+    address,
+    notes,
+    priceMap,
+    nameMap,
+  } = computed
+
+  const creds = await getMercadoPagoCredentials()
+  if (!creds) {
+    return { error: 'Mercado Pago no está configurado todavía' }
+  }
+
+  // Primero creamos la preferencia en Mercado Pago con un id de pedido
+  // generado por nosotros. Si el token no es válido, falla acá y NO se crea
+  // nada en la base (evita pedidos huérfanos por rollback con RLS).
+  const orderId = crypto.randomUUID()
+  let preference
+  try {
+    preference = await createPreference(creds.accessToken, {
+      orderId,
+      title: `Pedido TCG NQN #${orderId.slice(0, 8)}`,
+      total,
+    })
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'No se pudo iniciar el pago' }
+  }
+
+  const { data: order, error: orderError } = await supabase
+    .from('orders')
+    .insert({
+      id: orderId,
+      user_id: user.id,
+      total,
+      discount,
+      status: 'pending',
+      payment_method: 'mercadopago',
+      mp_preference_id: preference.id,
+      shipping_name: name,
+      shipping_phone: phone,
+      shipping_address: address,
+      shipping_method: shippingMethod,
+      shipping_label: shippingLabel,
+      shipping_price: shippingPrice,
+      shipping_cp: shippingCp || null,
+      notes: notes || null,
+    })
+    .select()
+    .single()
+  if (orderError || !order) return { error: 'No se pudo crear el pedido' }
+
+  const { error: itemsError } = await supabase.from('order_items').insert(
+    cart.map((i) => ({
+      order_id: order.id,
+      product_id: i.product.id,
+      quantity: i.quantity,
+      price: priceMap.get(i.product.id) ?? 0,
+      product_name: nameMap.get(i.product.id) ?? null,
+    })),
+  )
+  if (itemsError) return { error: 'No se pudo guardar los ítems' }
+
+  for (const item of cart) {
+    await supabase.rpc('decrement_stock', {
+      product_id: item.product.id,
+      qty: item.quantity,
+    })
+  }
+
+  return { initPoint: preference.initPoint, orderId }
+}
+
+export async function confirmMercadoPagoOrder(
+  orderId: string,
+  paymentId?: string | null,
+) {
+  const supabase = await createClient()
+  const { data: order } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single()
+  if (!order || order.payment_method !== 'mercadopago') {
+    return { ok: false, error: 'Pedido no encontrado' }
+  }
+  // Idempotente: si ya está confirmado o enviado, no hacemos nada.
+  if (order.status === 'confirmed' || order.status === 'shipped') {
+    return { ok: true }
+  }
+
+  let approved = false
+  if (paymentId) {
+    const creds = await getMercadoPagoCredentials()
+    if (creds) {
+      const payment = await getPayment(creds.accessToken, String(paymentId))
+      approved = payment?.status === 'approved'
+    }
+  }
+  if (!approved) return { ok: false, error: 'El pago todavía no está aprobado' }
+
+  const { error } = await supabase
+    .from('orders')
+    .update({ status: 'confirmed', mp_payment_id: String(paymentId) })
+    .eq('id', orderId)
+  if (error) return { ok: false, error: error.message }
+
+  const { data: items } = await supabase
+    .from('order_items')
+    .select('product_name, quantity, price')
+    .eq('order_id', orderId)
+  await notifyOrder(order, items ?? [])
+
+  return { ok: true }
+}
+
+export async function updateMercadoPagoSettings(formData: FormData) {
+  const supabase = await createClient()
+  const enabled = formData.get('mercadopago_enabled') === 'on'
+  const accessToken = String(formData.get('mercadopago_access_token') ?? '').trim()
+  const publicKey = String(formData.get('mercadopago_public_key') ?? '').trim()
+
+  // Si el campo viene vacío, mantenemos la credencial guardada.
+  const current = await getMercadoPagoCredentials()
+  const token = accessToken || current?.accessToken || null
+  const key = publicKey || current?.publicKey || null
+
+  const { error: settingsError } = await supabase
+    .from('site_settings')
+    .upsert({ id: 1, mercadopago_enabled: enabled }, { onConflict: 'id' })
+  if (settingsError) return { error: settingsError.message }
+
+  const { error: tokenError } = await supabase
+    .from('payment_settings')
+    .upsert(
+      {
+        id: 1,
+        mercadopago_access_token: token,
+        mercadopago_public_key: key,
+      },
+      { onConflict: 'id' },
+    )
+  if (tokenError) return { error: tokenError.message }
+  return { ok: true }
 }
 
 export async function createProduct(formData: FormData) {

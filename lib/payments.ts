@@ -14,7 +14,13 @@ export type PaymentMethod = {
 const TRANSFER_ALIAS = process.env.NEXT_PUBLIC_TRANSFER_ALIAS
 const TRANSFER_INFO = process.env.NEXT_PUBLIC_TRANSFER_INFO
 
-export function getPaymentMethods(): PaymentMethod[] {
+/**
+ * Métodos de pago activos. Mercado Pago se activa desde el panel admin
+ * (se pasa como parámetro porque vive en la base, no en el módulo).
+ */
+export function getPaymentMethods(
+  mercadopagoEnabled = false,
+): PaymentMethod[] {
   const methods: PaymentMethod[] = [
     {
       id: 'transferencia',
@@ -33,8 +39,8 @@ export function getPaymentMethods(): PaymentMethod[] {
     {
       id: 'mercadopago',
       label: 'Mercado Pago',
-      description: 'Pago online con tarjeta o saldo',
-      enabled: isEnabled('payments.mercadopago'),
+      description: 'Pago online con tarjeta, saldo o cuotas',
+      enabled: mercadopagoEnabled,
     },
   ]
   return methods.filter((m) => m.enabled)

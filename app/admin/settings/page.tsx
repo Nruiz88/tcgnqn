@@ -1,5 +1,6 @@
 import { getSiteSettings } from '@/lib/data'
-import { updateSiteSettings } from '@/lib/actions'
+import { getMercadoPagoCredentials } from '@/lib/mercadopago'
+import { updateMercadoPagoSettings, updateSiteSettings } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
 import type { SocialKey } from '@/lib/types'
 import {
@@ -91,53 +92,147 @@ const svgProps = {
 
 export default async function AdminSettingsPage() {
   const settings = await getSiteSettings()
+  const mp = await getMercadoPagoCredentials()
+  const mpTokenHint = mp?.accessToken
+    ? `Guardado: ${mp.accessToken.slice(0, 12)}…${mp.accessToken.slice(-4)}`
+    : null
 
   return (
     <div>
       <PageHeader
         icon="share"
-        title="Redes sociales"
-        description="Cargá los links de tus redes. Los que estén completos aparecen en el footer de la tienda."
+        title="Configuración"
+        description="Redes sociales del footer y medios de pago del checkout."
       />
 
-      <SectionCard title="Links de tus redes">
-        <form
-          action={async (formData: FormData) => {
-            'use server'
-            await updateSiteSettings(formData)
-            revalidatePath('/admin/settings')
-            revalidatePath('/', 'layout')
-          }}
-          className="space-y-4"
-        >
-          {socialFields.map((f) => (
-            <div key={f.key}>
-              <label className={labelCls}>{f.label}</label>
+      <div className="grid gap-6 xl:grid-cols-2">
+        <SectionCard title="Redes sociales">
+          <form
+            action={async (formData: FormData) => {
+              'use server'
+              await updateSiteSettings(formData)
+              revalidatePath('/admin/settings')
+              revalidatePath('/', 'layout')
+            }}
+            className="space-y-4"
+          >
+            {socialFields.map((f) => (
+              <div key={f.key}>
+                <label className={labelCls}>{f.label}</label>
+                <div className="relative mt-1">
+                  <svg
+                    {...svgProps}
+                    className={`pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${f.color}`}
+                  >
+                    {f.icon}
+                  </svg>
+                  <input
+                    name={f.key}
+                    defaultValue={settings?.[f.key] ?? ''}
+                    placeholder={f.placeholder}
+                    className="w-full rounded-lg border border-neutral-300 bg-transparent py-2 pl-9 pr-3 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+              </div>
+            ))}
+            <p className="text-xs text-neutral-400">
+              Dejá un campo vacío para no mostrar esa red.
+            </p>
+            <button type="submit" className={btnPrimary}>
+              <Icon name="check" className="h-4 w-4" />
+              Guardar redes
+            </button>
+          </form>
+        </SectionCard>
+
+        <SectionCard title="Mercado Pago">
+          <form
+            action={async (formData: FormData) => {
+              'use server'
+              await updateMercadoPagoSettings(formData)
+              revalidatePath('/admin/settings')
+              revalidatePath('/checkout')
+            }}
+            className="space-y-4"
+          >
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-neutral-200 p-3">
+              <input
+                type="checkbox"
+                name="mercadopago_enabled"
+                defaultChecked={!!settings?.mercadopago_enabled}
+                className="mt-1 h-4 w-4"
+              />
+              <span>
+                <span className="block text-sm font-medium">
+                  Activar pago con Mercado Pago
+                </span>
+                <span className="block text-xs text-neutral-500">
+                  Aparece como método de pago en el checkout. Requiere el access
+                  token de abajo.
+                </span>
+              </span>
+            </label>
+
+            <div>
+              <label className={labelCls}>
+                Access token{' '}
+                <span className="text-xs font-normal text-neutral-400">
+                  (empieza con APP_USR- o TEST-)
+                </span>
+              </label>
               <div className="relative mt-1">
                 <svg
                   {...svgProps}
-                  className={`pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${f.color}`}
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
                 >
-                  {f.icon}
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
                 <input
-                  name={f.key}
-                  defaultValue={settings?.[f.key] ?? ''}
-                  placeholder={f.placeholder}
+                  name="mercadopago_access_token"
+                  type="password"
+                  placeholder={
+                    mpTokenHint ? `${mpTokenHint} — dejalo vacío para mantener` : 'APP_USR-...'
+                  }
                   className="w-full rounded-lg border border-neutral-300 bg-transparent py-2 pl-9 pr-3 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
             </div>
-          ))}
-          <p className="text-xs text-neutral-400">
-            Dejá un campo vacío para no mostrar esa red.
-          </p>
-          <button type="submit" className={btnPrimary}>
-            <Icon name="check" className="h-4 w-4" />
-            Guardar redes
-          </button>
-        </form>
-      </SectionCard>
+
+            <div>
+              <label className={labelCls}>
+                Public key{' '}
+                <span className="text-xs font-normal text-neutral-400">
+                  (opcional, para el botón de pago embebido)
+                </span>
+              </label>
+              <input
+                name="mercadopago_public_key"
+                placeholder={mp?.publicKey ? 'Dejalo vacío para mantener' : 'TEST-... o APP_USR-...'}
+                className="mt-1 w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              />
+            </div>
+
+            <div className="rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-500">
+              <p>
+                <strong className="text-neutral-700">Modo prueba:</strong> con
+                un token que empiece en <code className="font-mono">TEST-</code>{' '}
+                el checkout usa el sandbox de Mercado Pago (tarjetas de prueba)
+                y no mueve dinero real.
+              </p>
+              <p className="mt-1">
+                ¿No tenés credenciales? Entrá a tu cuenta de Mercado Pago →
+                Desarrollo → Credenciales, y copiá el <em>Access Token</em>.
+              </p>
+            </div>
+
+            <button type="submit" className={btnPrimary}>
+              <Icon name="check" className="h-4 w-4" />
+              Guardar Mercado Pago
+            </button>
+          </form>
+        </SectionCard>
+      </div>
     </div>
   )
 }

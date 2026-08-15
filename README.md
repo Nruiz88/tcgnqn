@@ -1,6 +1,6 @@
 # TCG NQN — Tienda online
 
-E-commerce de cartas coleccionables construido con **Next.js** + **Supabase** (Auth + Postgres + RLS). Checkout manual: el cliente deja su pedido y se coordina el pago por WhatsApp/transferencia.
+E-commerce de cartas coleccionables construido con **Next.js** + **Supabase** (Auth + Postgres + RLS). Checkout con pago online vía **Mercado Pago** (se activa desde el panel admin con el access token) o coordinado por WhatsApp/transferencia.
 
 ## Stack
 

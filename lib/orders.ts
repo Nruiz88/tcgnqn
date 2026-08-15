@@ -23,3 +23,18 @@ export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   shipped: 'bg-green-500/10 text-green-600 ring-green-500/20 dark:text-green-400',
   cancelled: 'bg-red-500/10 text-red-600 ring-red-500/20 dark:text-red-400',
 }
+
+export function paymentMethodLabel(
+  method: string | null | undefined,
+): string {
+  switch (method) {
+    case 'mercadopago':
+      return 'Mercado Pago'
+    case 'transferencia':
+      return 'Transferencia'
+    case 'whatsapp':
+      return 'WhatsApp'
+    default:
+      return 'Manual'
+  }
+}

@@ -29,7 +29,7 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 |---|---|---|---|
 | `payments.transferencia` | ON | siempre | Checkout muestra alias/CBU + instrucciones | ✅ implementado |
 | `payments.whatsapp` | ON* | si `NEXT_PUBLIC_WHATSAPP` existe | Botón wa.me con resumen carrito/producto | ✅ implementado |
-| `payments.mercadopago` | OFF | credenciales MP | Preferencia de pago | 🔲 placeholder |
+| `payments.mercadopago` | OFF | toggle en Panel admin → Configuración (token guardado en `payment_settings`) | Preferencia de pago, redirect a MP, webhook de confirmación, auto-confirm del pedido al aprobarse | ✅ implementado |
 
 ### Módulos de envío
 
@@ -80,4 +80,4 @@ Archivos clave: `app/(store)/`, `lib/`, `proxy.ts`, `lib/modules/`.
 | `CORREO_ARGENTINO_SENDER_CP` | Código postal de origen (obligatorio) |
 | `CORREO_ARGENTINO_PKG_DIMS` | Dimensiones por defecto del paquete `largo,ancho,alto` (cm) |
 | `NEXT_PUBLIC_PICKUP_LOCATION` | Dirección del local para el retiro (fallback) |
-| Credenciales MP | Activan payments.mercadopago |
+| Credenciales MP | (ya no se usan por env) — se cargan en Panel admin → Configuración → Mercado Pago |

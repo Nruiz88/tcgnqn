@@ -6,6 +6,7 @@ import {
   ORDER_STATUS_LABELS,
   ORDER_STATUS_DESCRIPTIONS,
   ORDER_STATUS_COLORS,
+  paymentMethodLabel,
 } from '@/lib/orders'
 import { whatsappNumber } from '@/lib/whatsapp'
 
@@ -188,6 +189,12 @@ export default async function OrderDetailPage({
               {order.shipping_price > 0
                 ? formatPrice(order.shipping_price)
                 : 'Gratis'}
+            </dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-neutral-500">Método de pago</dt>
+            <dd className="font-medium">
+              {paymentMethodLabel(order.payment_method)}
             </dd>
           </div>
           <div className="flex justify-between gap-4 border-t border-neutral-200 pt-3 dark:border-neutral-800/60">

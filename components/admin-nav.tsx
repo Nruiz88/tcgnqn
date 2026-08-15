@@ -40,7 +40,7 @@ function groups(): NavGroup[] {
   }
   nav.push({
     label: 'Configuración',
-    items: [{ href: '/admin/settings', label: 'Redes sociales', icon: 'share' }],
+    items: [{ href: '/admin/settings', label: 'Configuración', icon: 'share' }],
   })
   return nav
 }

@@ -51,6 +51,9 @@ export type Order = {
   total: number
   discount: number
   status: OrderStatus
+  payment_method: string | null
+  mp_preference_id: string | null
+  mp_payment_id: string | null
   shipping_name: string
   shipping_phone: string
   shipping_address: string
@@ -97,6 +100,14 @@ export type SiteSettings = {
   x: string | null
   youtube: string | null
   discord: string | null
+  mercadopago_enabled: boolean
+  updated_at: string
+}
+
+export type PaymentSettings = {
+  id: number
+  mercadopago_access_token: string | null
+  mercadopago_public_key: string | null
   updated_at: string
 }
 

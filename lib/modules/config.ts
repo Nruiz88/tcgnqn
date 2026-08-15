@@ -1,7 +1,6 @@
 export type ModuleKey =
   | 'payments.transferencia'
   | 'payments.whatsapp'
-  | 'payments.mercadopago'
   | 'shipping.correo_argentino'
   | 'wishlist'
   | 'coupons'
@@ -10,7 +9,6 @@ export type ModuleKey =
 export const modules: Record<ModuleKey, boolean> = {
   'payments.transferencia': true,
   'payments.whatsapp': !!process.env.NEXT_PUBLIC_WHATSAPP,
-  'payments.mercadopago': false,
   'shipping.correo_argentino':
     !!process.env.CORREO_ARGENTINO_USER_TOKEN &&
     !!process.env.CORREO_ARGENTINO_PASSWORD_TOKEN &&

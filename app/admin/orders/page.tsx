@@ -2,7 +2,11 @@ import { getAllOrders } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
 import { isEnabled } from '@/lib/modules'
 import { whatsappNumber } from '@/lib/whatsapp'
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/orders'
+import {
+  ORDER_STATUS_LABELS,
+  ORDER_STATUS_COLORS,
+  paymentMethodLabel,
+} from '@/lib/orders'
 import { Icon, PageHeader, EmptyState } from '@/components/admin-ui'
 import OrderStatusSelect from '@/components/order-status-select'
 
@@ -98,12 +102,17 @@ export default async function AdminOrdersPage() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span
                   className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${ORDER_STATUS_COLORS[order.status]}`}
                 >
                   {ORDER_STATUS_LABELS[order.status]}
                 </span>
+                {order.payment_method && order.payment_method !== 'manual' && (
+                  <span className="inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600 ring-1 ring-inset ring-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:ring-neutral-700">
+                    Pago: {paymentMethodLabel(order.payment_method)}
+                  </span>
+                )}
                 <span className="font-display text-lg font-bold tracking-tight">
                   {formatPrice(order.total)}
                 </span>
