@@ -271,7 +271,7 @@ export default async function Home({
                   <img
                     src={g.image_url}
                     alt={g.name}
-                    className="relative h-20 w-20 rounded-2xl object-cover shadow-md"
+                    className="relative h-14 w-full object-contain sm:h-16"
                   />
                 ) : (
                   <span
@@ -280,18 +280,11 @@ export default async function Home({
                     {g.emoji}
                   </span>
                 )}
-                <p className="relative mt-4 font-display text-lg font-semibold">{g.name}</p>
-                <span
-                  className={`relative mt-3 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
-                    total > 0
-                      ? 'bg-neutral-100 text-neutral-500 transition group-hover:bg-indigo-600 group-hover:text-white'
-                      : 'bg-emerald-100 text-emerald-700'
-                  }`}
-                >
-                  {total > 0
-                    ? `${total} ${total === 1 ? 'producto' : 'productos'}`
-                    : 'Próximamente'}
-                </span>
+                {total > 0 && (
+                  <span className="relative mt-4 rounded-full bg-neutral-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-500 transition group-hover:bg-indigo-600 group-hover:text-white">
+                    {total} {total === 1 ? 'producto' : 'productos'}
+                  </span>
+                )}
                 <span className="relative mt-5 inline-flex items-center gap-1.5 rounded-full border border-indigo-500/40 px-4 py-1.5 text-sm font-semibold text-indigo-500 transition group-hover:border-indigo-500 group-hover:bg-indigo-500 group-hover:text-white">
                   Ver juego
                   <span className="transition-transform group-hover:translate-x-1">→</span>
