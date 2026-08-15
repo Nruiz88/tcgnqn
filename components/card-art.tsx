@@ -67,12 +67,23 @@ export default function CardArt({
       style={{ aspectRatio: '5 / 7' }}
     >
       {product.image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={product.image_url}
-          alt={product.name}
-          className="h-full w-full object-cover"
-        />
+        <>
+          {/* Halo: imagen desenfocada detrás de la carta */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.image_url}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full scale-150 object-cover opacity-30 blur-2xl saturate-150 transition-all duration-500 motion-reduce:transition-none"
+          />
+          {/* Carta principal: se achica y satura en hover */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="relative h-full w-full object-cover transition-all duration-300 motion-reduce:transition-none group-hover:scale-95 group-hover:saturate-125"
+          />
+        </>
       ) : (
         <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
           Sin imagen
