@@ -204,35 +204,24 @@ export default async function Home({
         />
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {games.map((g) => {
-            const isActive = activeGame?.slug === g.slug
             const gradient = g.color ?? 'from-neutral-500 to-neutral-700'
             return (
               <Link
                 key={g.id}
-                href={isActive ? '/#juegos' : `/?game=${g.slug}#juegos`}
-                className={`group relative overflow-hidden rounded-3xl border p-6 transition hover:-translate-y-1 hover:shadow-xl ${
-                  isActive
-                    ? 'border-neutral-900 bg-[#0d0f14] text-white'
-                    : 'border-neutral-200 bg-surface'
-                }`}
+                href={`/cartas?game=${g.slug}`}
+                className="group relative overflow-hidden rounded-3xl border border-neutral-200 bg-surface p-6 transition hover:-translate-y-1 hover:shadow-xl"
               >
                 <div
                   className={`pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${gradient} opacity-20 blur-2xl transition group-hover:opacity-40`}
                 />
                 <div className="flex items-center justify-between">
                   <span className="text-3xl">{g.emoji}</span>
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${
-                      isActive
-                        ? 'bg-surface/15 text-white'
-                        : 'bg-neutral-100 text-neutral-500'
-                    }`}
-                  >
-                    {isActive ? 'Activo' : 'Ver →'}
+                  <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-neutral-500 transition group-hover:bg-indigo-600 group-hover:text-white">
+                    Singles →
                   </span>
                 </div>
                 <p className="mt-5 font-display text-base font-semibold">{g.name}</p>
-                <p className={`mt-1 text-xs ${isActive ? 'text-white/60' : 'text-neutral-400'}`}>
+                <p className="mt-1 text-xs text-neutral-400">
                   Singles, sobres y accesorios
                 </p>
               </Link>
@@ -256,11 +245,13 @@ export default async function Home({
           <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
             {categories.map((c) => {
               const isActive = activeCategory?.slug === c.slug
+              const isCartas = c.slug === 'cartas'
               const params = new URLSearchParams()
               if (activeGame && !isActive) params.set('game', activeGame.slug)
               if (!isActive) params.set('cat', c.slug)
-              const href =
-                isActive || (!activeGame && !isActive && !activeCategory)
+              const href = isCartas
+                ? '/cartas'
+                : isActive || (!activeGame && !isActive && !activeCategory)
                   ? `/?cat=${c.slug}`
                   : `/?${params.toString()}`
               return (

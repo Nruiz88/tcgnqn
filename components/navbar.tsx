@@ -54,6 +54,16 @@ export default function Navbar() {
           >
             Tienda
           </Link>
+          <Link
+            href="/cartas"
+            className={`text-sm font-medium ${
+              pathname === '/cartas'
+                ? 'text-neutral-900'
+                : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            Cartas
+          </Link>
           {isEnabled('wishlist') && (
             <Link
               href="/favoritos"

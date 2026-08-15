@@ -23,6 +23,8 @@ Guía de verificación para la página de inicio.
 - [x] Tipografía moderna (Space Grotesk en títulos + Geist en texto)
 - [x] Hero con patrón de cuadrícula, tarjetas flotantes y marquee de juegos
 - [ ] Página "Ver todo" con paginación
+- [x] Sección Singles: página `/cartas` con filtro por juego (chips)
+- [x] Juegos del home linkean a sus singles (`/cartas?game=slug`)
 - [x] Campo de cupón en checkout (módulo coupons)
 - [x] Selección de método de pago en checkout (transferencia / WhatsApp / MP)
 - [x] Instrucciones de transferencia según método (alias/CVU)
