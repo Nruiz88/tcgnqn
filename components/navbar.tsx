@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useCart } from '@/lib/cart-context'
@@ -26,9 +27,13 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-surface/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0d0f14] text-sm text-white">
-            🃏
-          </span>
+          <Image
+            src="/logo.webp"
+            alt="TCG NQN"
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-full object-cover"
+          />
           <span className="text-lg font-bold tracking-tight">TCG NQN</span>
         </Link>
         <form onSubmit={submit} className="hidden max-w-xs flex-1 md:block">
