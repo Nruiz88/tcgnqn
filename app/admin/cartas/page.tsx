@@ -1,5 +1,6 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
-import { getAllProducts, getCategories } from '@/lib/data'
+import { getAdminProducts, getCategories, getGames } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
 import { toggleProduct, deleteProduct } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
@@ -12,26 +13,61 @@ import {
   btnSecondary,
   btnDanger,
 } from '@/components/admin-ui'
+import AdminProductsToolbar from '@/components/admin-products-toolbar'
 
 export const dynamic = 'force-dynamic'
+
+const PAGE_SIZE = 20
 
 const tagCls =
   'inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600 ring-1 ring-inset ring-neutral-200 dark:bg-neutral-800/60 dark:text-neutral-400 dark:ring-neutral-700/60'
 
-export default async function AdminCartasPage() {
-  const [products, categories] = await Promise.all([
-    getAllProducts(),
+function firstString(
+  v: string | string[] | undefined,
+): string | undefined {
+  return typeof v === 'string' ? v : undefined
+}
+
+export default async function AdminCartasPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const sp = await searchParams
+
+  const status = firstString(sp.estado)
+  const sort = firstString(sp.sort)
+  const [categories, games, result] = await Promise.all([
     getCategories(),
+    getGames(),
+    getAdminProducts({
+      categorySlug: 'cartas',
+      query: firstString(sp.q) ?? '',
+      gameId: firstString(sp.game) ?? '',
+      condition: firstString(sp.cond) ?? '',
+      language: firstString(sp.lang) ?? '',
+      status:
+        status === 'active' || status === 'hidden'
+          ? status
+          : undefined,
+      sort: ['price_asc', 'price_desc', 'stock_asc'].includes(sort ?? '')
+        ? (sort as 'price_asc' | 'price_desc' | 'stock_asc')
+        : undefined,
+      page: Math.max(1, Number(sp.page) || 1),
+      pageSize: PAGE_SIZE,
+    }),
   ])
+
   const cartasId = categories.find((c) => c.slug === 'cartas')?.id
-  const cards = products.filter((p) => p.category?.slug === 'cartas')
+  const cards = result.products
+  const pageCount = Math.max(1, Math.ceil(result.total / PAGE_SIZE))
 
   return (
     <div>
       <PageHeader
         icon="fileText"
         title="Cartas individuales"
-        description={`${cards.length} cartas en la sección Singles`}
+        description={`${result.total} cartas en la sección Singles`}
       >
         <Link
           href={cartasId ? '/admin/cartas/new' : '/admin/categories'}
@@ -42,21 +78,39 @@ export default async function AdminCartasPage() {
         </Link>
       </PageHeader>
 
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-surface p-2">
+      <Suspense fallback={null}>
+        <AdminProductsToolbar
+          total={result.total}
+          pageCount={pageCount}
+          games={games}
+        />
+      </Suspense>
+
+      <div className="mt-4 rounded-2xl border border-neutral-200 bg-surface p-2">
         {cards.length === 0 && (
           <div className="p-2">
             <EmptyState
               icon="fileText"
-              title="No hay cartas cargadas"
-              description="Cargá la primera carta para sumarla a la sección Singles."
+              title={
+                result.total === 0
+                  ? 'No hay cartas cargadas'
+                  : 'Sin resultados para esos filtros'
+              }
+              description={
+                result.total === 0
+                  ? 'Cargá la primera carta para sumarla a la sección Singles.'
+                  : 'Probá con otra búsqueda o quitá algún filtro.'
+              }
               action={
-                <Link
-                  href={cartasId ? '/admin/cartas/new' : '/admin/categories'}
-                  className={btnPrimary}
-                >
-                  <Icon name="plus" className="h-4 w-4" />
-                  Nueva carta
-                </Link>
+                result.total === 0 ? (
+                  <Link
+                    href={cartasId ? '/admin/cartas/new' : '/admin/categories'}
+                    className={btnPrimary}
+                  >
+                    <Icon name="plus" className="h-4 w-4" />
+                    Nueva carta
+                  </Link>
+                ) : undefined
               }
             />
           </div>
@@ -125,9 +179,7 @@ export default async function AdminCartasPage() {
                   }}
                 >
                   <button
-                    title={
-                      card.active ? 'Ocultar carta' : 'Publicar carta'
-                    }
+                    title={card.active ? 'Ocultar carta' : 'Publicar carta'}
                     className={btnSecondary}
                   >
                     <Icon

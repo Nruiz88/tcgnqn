@@ -61,6 +61,8 @@ export type Order = {
   shipping_label: string | null
   shipping_price: number
   shipping_cp: string | null
+  shipping_tracking_id: string | null
+  shipping_label_reference: string | null
   notes: string | null
   created_at: string
 }
@@ -108,6 +110,24 @@ export type PaymentSettings = {
   id: number
   mercadopago_access_token: string | null
   mercadopago_public_key: string | null
+  updated_at: string
+}
+
+export type ShippingSettings = {
+  id: number
+  correo_user_token: string | null
+  correo_password_token: string | null
+  correo_email: string | null
+  correo_password: string | null
+  correo_customer_id: string | null
+  correo_sender_cp: string | null
+  updated_at: string
+}
+
+export type NotificationSettings = {
+  id: number
+  whatsapp_token: string | null
+  whatsapp_phone_id: string | null
   updated_at: string
 }
 

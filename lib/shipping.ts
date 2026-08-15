@@ -1,4 +1,6 @@
-import { isEnabled } from '@/lib/modules'
+import 'server-only'
+import { createAdminClient } from '@/lib/supabase/admin'
+import type { ShippingSettings } from '@/lib/types'
 
 // ---------------------------------------------------------------------------
 // Tipos públicos
@@ -67,19 +69,100 @@ export interface ShippingGateway {
 }
 
 // ---------------------------------------------------------------------------
+// Credenciales de MiCorreo (panel admin → tabla shipping_settings, con
+// fallback a .env.local). Se cachean 60s; el admin panel las invalida al guardar.
+// ---------------------------------------------------------------------------
+
+type CorreoCredentials = {
+  userToken: string | null
+  passwordToken: string | null
+  email: string | null
+  password: string | null
+  customerId: string | null
+  senderCp: string | null
+}
+
+const ENV_CREDENTIALS: CorreoCredentials = {
+  userToken: process.env.CORREO_ARGENTINO_USER_TOKEN ?? null,
+  passwordToken: process.env.CORREO_ARGENTINO_PASSWORD_TOKEN ?? null,
+  email: process.env.CORREO_ARGENTINO_EMAIL ?? null,
+  password: process.env.CORREO_ARGENTINO_PASSWORD ?? null,
+  customerId: process.env.CORREO_ARGENTINO_CUSTOMER_ID ?? null,
+  senderCp: process.env.CORREO_ARGENTINO_SENDER_CP ?? null,
+}
+
+let credsCache: CorreoCredentials | null = null
+let credsCacheAt = 0
+
+async function getCorreoCredentials(): Promise<CorreoCredentials> {
+  if (credsCache && Date.now() - credsCacheAt < 60_000) return credsCache
+  const creds = { ...ENV_CREDENTIALS }
+  try {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('shipping_settings')
+      .select('*')
+      .eq('id', 1)
+      .single()
+    if (data) {
+      const s = data as ShippingSettings
+      creds.userToken = s.correo_user_token?.trim() || creds.userToken
+      creds.passwordToken =
+        s.correo_password_token?.trim() || creds.passwordToken
+      creds.email = s.correo_email?.trim() || creds.email
+      creds.password = s.correo_password?.trim() || creds.password
+      creds.customerId = s.correo_customer_id?.trim() || creds.customerId
+      creds.senderCp = s.correo_sender_cp?.trim() || creds.senderCp
+    }
+  } catch {
+    // Tabla ausente (migración sin aplicar) o error de red: quedan las de env.
+  }
+  credsCache = creds
+  credsCacheAt = Date.now()
+  return creds
+}
+
+/** Invalida la caché de credenciales (se llama al guardar en el panel admin). */
+export function invalidateCorreoCredentialsCache() {
+  credsCache = null
+  credsCacheAt = 0
+}
+
+/** ¿Está configurado el envío por Correo Argentino? (panel admin o env). */
+export async function isCorreoArgentinoConfigured(): Promise<boolean> {
+  const c = await getCorreoCredentials()
+  return !!(c.userToken && c.passwordToken && c.senderCp)
+}
+
+/** Lectura directa (sin caché) de lo guardado, para el panel admin. */
+export async function getShippingSettingsRow(): Promise<ShippingSettings | null> {
+  try {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('shipping_settings')
+      .select('*')
+      .eq('id', 1)
+      .single()
+    return (data as ShippingSettings | null) ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Gateway de Correo Argentino si hay credenciales, o null. */
+export async function getCorreoArgentinoGateway(): Promise<ShippingGateway | null> {
+  const c = await getCorreoCredentials()
+  if (!c.userToken || !c.passwordToken || !c.senderCp) return null
+  return new CorreoArgentinoGateway()
+}
+
+// ---------------------------------------------------------------------------
 // Cliente API MiCorreo (server-only)
 // ---------------------------------------------------------------------------
 
 const API_URL =
   process.env.CORREO_ARGENTINO_API_URL ??
   'https://api.correoargentino.com.ar/micorreo/v1'
-
-const USER_TOKEN = process.env.CORREO_ARGENTINO_USER_TOKEN
-const PASSWORD_TOKEN = process.env.CORREO_ARGENTINO_PASSWORD_TOKEN
-const ACCOUNT_EMAIL = process.env.CORREO_ARGENTINO_EMAIL
-const ACCOUNT_PASSWORD = process.env.CORREO_ARGENTINO_PASSWORD
-const CUSTOMER_ID = process.env.CORREO_ARGENTINO_CUSTOMER_ID
-const SENDER_CP = process.env.CORREO_ARGENTINO_SENDER_CP
 
 // Dimensiones por defecto del paquete (cm) si el pedido no las especifica.
 const PKG_DIMS = (process.env.CORREO_ARGENTINO_PKG_DIMS ?? '30,20,10')
@@ -93,12 +176,15 @@ let customerIdCache: string | null = null
 
 async function fetchToken(): Promise<string> {
   if (tokenCache && Date.now() < tokenCache.expiresAt) return tokenCache.token
-  if (!USER_TOKEN || !PASSWORD_TOKEN) {
+  const creds = await getCorreoCredentials()
+  if (!creds.userToken || !creds.passwordToken) {
     throw new Error(
-      'correo_argentino: faltan CORREO_ARGENTINO_USER_TOKEN y CORREO_ARGENTINO_PASSWORD_TOKEN',
+      'correo_argentino: faltan el usuario y password token (configuralos en Panel admin → Configuración)',
     )
   }
-  const basic = Buffer.from(`${USER_TOKEN}:${PASSWORD_TOKEN}`).toString('base64')
+  const basic = Buffer.from(
+    `${creds.userToken}:${creds.passwordToken}`,
+  ).toString('base64')
   const res = await fetch(`${API_URL}/token`, {
     method: 'POST',
     headers: { Authorization: `Basic ${basic}` },
@@ -119,9 +205,10 @@ async function fetchToken(): Promise<string> {
 }
 
 async function fetchCustomerId(token: string): Promise<string> {
-  if (CUSTOMER_ID) return CUSTOMER_ID
+  const creds = await getCorreoCredentials()
+  if (creds.customerId) return creds.customerId
   if (customerIdCache) return customerIdCache
-  if (!ACCOUNT_EMAIL || !ACCOUNT_PASSWORD) {
+  if (!creds.email || !creds.password) {
     throw new Error(
       'correo_argentino: faltan CORREO_ARGENTINO_EMAIL/PASSWORD o CORREO_ARGENTINO_CUSTOMER_ID',
     )
@@ -132,7 +219,7 @@ async function fetchCustomerId(token: string): Promise<string> {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email: ACCOUNT_EMAIL, password: ACCOUNT_PASSWORD }),
+    body: JSON.stringify({ email: creds.email, password: creds.password }),
   })
   const data = (await res.json().catch(() => null)) as {
     customerId?: string
@@ -204,22 +291,22 @@ class CorreoArgentinoGateway implements ShippingGateway {
   id = 'correo_argentino'
   label = 'Correo Argentino'
   description = 'Envío por Paq.AR a domicilio o sucursal'
-  enabled =
-    isEnabled('shipping.correo_argentino') &&
-    Boolean(USER_TOKEN && PASSWORD_TOKEN && SENDER_CP)
+  // Solo se instancia cuando hay credenciales (getCorreoArgentinoGateway).
+  enabled = true
 
   async quote(
     destination: ShippingDestination,
     pkg: ShippingPackage,
   ): Promise<ShippingQuote[]> {
-    if (!SENDER_CP) return []
+    const creds = await getCorreoCredentials()
+    if (!creds.senderCp) return []
     if (!destination.postalCode) return []
     const token = await fetchToken()
     const customerId = await fetchCustomerId(token)
     // Sin deliveredType: MiCorreo devuelve domicilio (D) y sucursal (S) en un solo request.
     const data = await apiFetch<RatesResponse>('/rates', {
       customerId,
-      postalCodeOrigin: SENDER_CP,
+      postalCodeOrigin: creds.senderCp,
       postalCodeDestination: destination.postalCode,
       dimensions: pkgDims(pkg),
     })
@@ -335,13 +422,11 @@ class PickupGateway implements ShippingGateway {
 // Registro y helpers
 // ---------------------------------------------------------------------------
 
-export const shippingGateways: ShippingGateway[] = [
-  new PickupGateway(), // siempre disponible (fallback)
-  new CorreoArgentinoGateway(),
-]
-
-export function getShippingGateways(): ShippingGateway[] {
-  return shippingGateways.filter((g) => g.enabled)
+export async function getShippingGateways(): Promise<ShippingGateway[]> {
+  const gateways: ShippingGateway[] = [new PickupGateway()] // siempre disponible (fallback)
+  const correo = await getCorreoArgentinoGateway()
+  if (correo) gateways.push(correo)
+  return gateways
 }
 
 export async function quoteShipping(
@@ -349,7 +434,7 @@ export async function quoteShipping(
   pkg: ShippingPackage,
 ): Promise<ShippingQuote[]> {
   const quotes: ShippingQuote[] = []
-  for (const gateway of getShippingGateways()) {
+  for (const gateway of await getShippingGateways()) {
     try {
       quotes.push(...(await gateway.quote(destination, pkg)))
     } catch (err) {

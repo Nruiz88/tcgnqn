@@ -15,8 +15,8 @@ Guía de verificación para el panel de administración.
 - [x] Lista de pedidos: nombre/tel/dirección, fecha, notas, total, items, selector de estado
 - [x] CRUD de categorías (asignar al crear/editar producto)
 - [x] Gestión de cupones (CRUD admin + Pausar/Activar)
-- [ ] Búsqueda y filtros en lista de productos
-- [ ] Paginación de listas
+- [x] Búsqueda y filtros en lista de productos (URL-driven con nuqs: texto, juego, condición, idioma, estado, orden)
+- [x] Paginación de listas (server-side, 20 por página, en `/admin/cartas`)
 - [ ] Upload de imagen a Supabase Storage (hoy solo URL)
 - [ ] Detalle de pedido + badges de color por estado
 - [x] Botón WhatsApp para contactar al cliente del pedido
@@ -33,6 +33,9 @@ Guía de verificación para el panel de administración.
 - [x] Server Action: CRUD de categorías
 - [ ] Generación de guía Correo Argentino desde pedido (módulo shipping)
   - ✅ `lib/shipping.ts`: gateway implementado con API MiCorreo real (`quote`, `createLabel`, `track`) + fallback a retiro en local
-  - [ ] UI en `/admin/orders` para generar la guía y guardar el tracking
+  - [x] UI en `/admin/orders` para generar la guía y guardar el tracking (botón por pedido + columnas `shipping_tracking_id` / `shipping_label_reference`, migración 013)
+  - [x] Credenciales de Correo Argentino configurables desde `/admin/settings` (tabla `shipping_settings`, migración 014; fallback a `.env.local`)
+  - [x] Seguimiento del envío visible para el cliente en `/account/orders/[id]` (referencia + link a Correo Argentino)
+  - [x] Aviso al cliente por WhatsApp al despachar (guía generada o estado Enviado): Cloud API de Meta configurable desde `/admin/settings` (tabla `notification_settings`, migración 015; fallback a link wa.me)
   - [x] Checkout con selector de envío (cotización en vivo por CP) + retiro en local
   - [x] Costo de envío en el total del pedido (recotizado server-side) y visible en admin/cuenta

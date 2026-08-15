@@ -31,6 +31,75 @@ export async function getProducts(): Promise<Product[]> {
   return (data ?? []) as Product[]
 }
 
+export type AdminProductsFilter = {
+  categorySlug?: string
+  query?: string
+  gameId?: string
+  condition?: string
+  language?: string
+  status?: 'active' | 'hidden' | 'all'
+  sort?: 'newest' | 'price_asc' | 'price_desc' | 'stock_asc'
+  page?: number
+  pageSize?: number
+}
+
+/**
+ * Lista paginada de productos para el panel admin, con búsqueda y filtros.
+ * Devuelve también el total para armar la paginación.
+ */
+export async function getAdminProducts(
+  filter: AdminProductsFilter = {},
+): Promise<{ products: Product[]; total: number }> {
+  const supabase = await createClient()
+  let query = supabase
+    .from('products')
+    .select('*, category:categories(*), game:games(*)', { count: 'exact' })
+
+  if (filter.categorySlug) {
+    const { data: cat } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', filter.categorySlug)
+      .single()
+    if (cat) query = query.eq('category_id', cat.id)
+  }
+
+  const q = filter.query?.trim()
+  if (q) {
+    // .or() usa comas como separador: se escapan para no romper la sintaxis.
+    const safe = q.replace(/,/g, ' ')
+    query = query.or(`name.ilike.%${safe}%,description.ilike.%${safe}%`)
+  }
+  if (filter.gameId) query = query.eq('game_id', filter.gameId)
+  if (filter.condition) query = query.eq('condition', filter.condition)
+  if (filter.language) query = query.eq('language', filter.language)
+  if (filter.status === 'active') query = query.eq('active', true)
+  if (filter.status === 'hidden') query = query.eq('active', false)
+
+  switch (filter.sort ?? 'newest') {
+    case 'price_asc':
+      query = query.order('price', { ascending: true })
+      break
+    case 'price_desc':
+      query = query.order('price', { ascending: false })
+      break
+    case 'stock_asc':
+      query = query.order('stock', { ascending: true })
+      break
+    default:
+      query = query.order('created_at', { ascending: false })
+  }
+
+  const pageSize = Math.min(50, Math.max(1, filter.pageSize ?? 20))
+  const page = Math.max(1, filter.page ?? 1)
+  const from = (page - 1) * pageSize
+  query = query.range(from, from + pageSize - 1)
+
+  const { data, count, error } = await query
+  if (error) throw new Error(error.message)
+  return { products: (data ?? []) as Product[], total: count ?? 0 }
+}
+
 export async function getCategories(): Promise<Category[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
