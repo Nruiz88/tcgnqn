@@ -47,7 +47,7 @@ export default async function ProductPage({
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="mx-auto max-w-md">
+          <div className="mx-auto max-w-xs">
             {isCardProduct ? (
               <CardArt product={product} showInfo={false} />
             ) : (

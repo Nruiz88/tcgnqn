@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Product } from '@/lib/types'
@@ -15,18 +14,29 @@ export default function QuickViewModal({ product }: { product: Product }) {
   const [added, setAdded] = useState(false)
   const cardProduct = isCard(product)
 
+  function close() {
+    const from = sessionStorage.getItem('qv_from')
+    if (from) {
+      sessionStorage.removeItem('qv_from')
+      router.replace(from)
+      return
+    }
+    router.back()
+  }
+
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') router.back()
+      if (e.key === 'Escape') close()
     }
     window.addEventListener('keydown', onKey)
     return () => {
       document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
-  }, [router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleAdd = () => {
     if (product.stock <= 0) return
@@ -35,15 +45,13 @@ export default function QuickViewModal({ product }: { product: Product }) {
     setTimeout(() => setAdded(false), 1500)
   }
 
-  const kicker = cardProduct
-    ? product.game?.name ?? 'Carta'
-    : 'Producto'
+  const kicker = cardProduct ? product.game?.name ?? 'Carta' : 'Producto'
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6">
       <button
         aria-label="Cerrar"
-        onClick={() => router.back()}
+        onClick={close}
         className="absolute inset-0 h-full w-full cursor-default bg-black/60 backdrop-blur-sm"
       />
       <div
@@ -52,7 +60,7 @@ export default function QuickViewModal({ product }: { product: Product }) {
         className="relative flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl sm:rounded-2xl"
       >
         <button
-          onClick={() => router.back()}
+          onClick={close}
           aria-label="Cerrar"
           className="absolute right-3 top-3 z-20 rounded-full p-2 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-800"
         >
@@ -170,12 +178,12 @@ export default function QuickViewModal({ product }: { product: Product }) {
           >
             {added ? '✓ Agregado' : product.stock <= 0 ? 'Sin stock' : 'Agregar al carrito'}
           </button>
-          <Link
+          <a
             href={`/product/${product.id}`}
             className="text-center text-xs text-neutral-500 transition hover:text-neutral-700"
           >
             Ver página completa →
-          </Link>
+          </a>
         </footer>
       </div>
     </div>
