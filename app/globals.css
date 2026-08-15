@@ -63,3 +63,73 @@ body {
     linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px);
   background-size: 48px 48px;
 }
+
+.card-tilt {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-tilt {
+    transition: none;
+  }
+  .holo-overlay,
+  .holo-tint {
+    animation: none !important;
+  }
+}
+
+.holo-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      110% 110% at var(--gx, 50%) var(--gy, 50%),
+      rgb(255 255 255 / 0.22),
+      transparent 60%
+    ),
+    linear-gradient(
+      115deg,
+      transparent 38%,
+      rgb(255 255 255 / 0.38) 50%,
+      transparent 62%
+    );
+  background-size:
+    100% 100%,
+    300% 100%;
+  background-repeat: no-repeat;
+  mix-blend-mode: overlay;
+  animation: holo-shimmer 4s linear infinite;
+}
+
+.holo-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: conic-gradient(
+    from 210deg,
+    #f0f,
+    #0ff,
+    #0f0,
+    #ff0,
+    #f0f
+  );
+  opacity: 0.16;
+  mix-blend-mode: color-dodge;
+}
+
+@keyframes holo-shimmer {
+  0% {
+    background-position:
+      0% 0%,
+      200% 0%;
+  }
+  100% {
+    background-position:
+      0% 0%,
+      -200% 0%;
+  }
+}

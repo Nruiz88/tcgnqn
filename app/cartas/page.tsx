@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getProducts, getGames } from '@/lib/data'
-import ProductCard from '@/components/product-card'
+import CardTile from '@/components/card-tile'
 
 export const dynamic = 'force-dynamic'
 
@@ -76,7 +76,7 @@ export default async function CartasPage({
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {filtered.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <CardTile key={product.id} product={product} />
           ))}
         </div>
       )}
