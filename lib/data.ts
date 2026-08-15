@@ -114,7 +114,7 @@ export async function getWishlist(): Promise<Product[]> {
 
   const { data, error } = await supabase
     .from('wishlist_items')
-    .select('product(*, categories(*), games(*))')
+    .select('product:products(*, categories(*), games(*))')
     .eq('user_id', user.id)
   if (error) throw new Error(error.message)
   const items = (data ?? []) as unknown as { product: Product | null }[]
@@ -130,7 +130,7 @@ export async function getMyOrders(): Promise<OrderWithItems[]> {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, product(*))')
+    .select('*, order_items(*, product:products(*))')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
@@ -141,7 +141,7 @@ export async function getAllOrders(): Promise<OrderWithItems[]> {
   const supabase = await createClient()
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, product(*))')
+    .select('*, order_items(*, product:products(*))')
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (orders ?? []) as OrderWithItems[]
