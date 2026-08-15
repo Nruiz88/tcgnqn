@@ -103,3 +103,7 @@ export const CARD_RARITY: Record<
 export function rarityFor(cardType: string | null) {
   return cardType ? CARD_RARITY[cardType] ?? DEFAULT_RARITY : DEFAULT_RARITY
 }
+
+export function isCard(p: { category?: { slug?: string | null } | null }) {
+  return p.category?.slug === 'cartas'
+}

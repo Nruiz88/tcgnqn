@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { getWishlist } from '@/lib/data'
 import ProductCard from '@/components/product-card'
+import CardTile from '@/components/card-tile'
 import { requireModule } from '@/lib/modules'
+import { isCard } from '@/lib/cards'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,9 +35,13 @@ export default async function WishlistPage() {
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {products.map((product) =>
+            isCard(product) ? (
+              <CardTile key={product.id} product={product} />
+            ) : (
+              <ProductCard key={product.id} product={product} />
+            ),
+          )}
         </div>
       )}
     </div>

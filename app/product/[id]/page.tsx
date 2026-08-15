@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation'
 import { getProduct } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
 import AddToCartButton from '@/components/add-to-cart-button'
-import { CONDITION_LABELS, LANGUAGE_LABELS } from '@/lib/cards'
+import CardArt from '@/components/card-art'
+import { CONDITION_LABELS, LANGUAGE_LABELS, isCard } from '@/lib/cards'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,17 +19,23 @@ export default async function ProductPage({
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="grid gap-8 md:grid-cols-2">
-        <div className="aspect-square overflow-hidden rounded-lg bg-neutral-100">
-          {product.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="h-full w-full object-cover"
-            />
+        <div className="md:sticky md:top-24 md:self-start">
+          {isCard(product) ? (
+            <CardArt product={product} showInfo={false} />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-neutral-400">
-              Sin imagen
+            <div className="aspect-square overflow-hidden rounded-lg bg-neutral-100">
+              {product.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-neutral-400">
+                  Sin imagen
+                </div>
+              )}
             </div>
           )}
         </div>

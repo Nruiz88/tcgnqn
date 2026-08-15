@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { getProducts, getCategories, getGames } from '@/lib/data'
 import ProductCard from '@/components/product-card'
+import CardTile from '@/components/card-tile'
+import { isCard } from '@/lib/cards'
 
 export const dynamic = 'force-dynamic'
 
@@ -306,9 +308,13 @@ export default async function Home({
           </p>
         ) : (
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {featured.map((product) =>
+              isCard(product) ? (
+                <CardTile key={product.id} product={product} />
+              ) : (
+                <ProductCard key={product.id} product={product} />
+              ),
+            )}
           </div>
         )}
       </section>
@@ -323,9 +329,13 @@ export default async function Home({
             href="/#productos"
           />
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {latest.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {latest.map((product) =>
+              isCard(product) ? (
+                <CardTile key={product.id} product={product} />
+              ) : (
+                <ProductCard key={product.id} product={product} />
+              ),
+            )}
           </div>
         </section>
       )}
