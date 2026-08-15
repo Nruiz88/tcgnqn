@@ -202,39 +202,54 @@ export default async function Home({
         <SectionHeader
           kicker="Juegos"
           title="Elegí tu juego"
-          subtitle="Todo lo que buscás para tu TCG favorito"
+          subtitle="Singles, sobres, cajas y accesorios para tu juego favorito"
         />
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {games.map((g) => {
             const gradient = g.color ?? 'from-neutral-500 to-neutral-700'
+            const total = allProducts.filter((p) => p.game?.slug === g.slug).length
             return (
               <Link
                 key={g.id}
                 href={`/cartas?game=${g.slug}`}
-                className="group relative overflow-hidden rounded-3xl border border-neutral-200 bg-surface p-6 transition hover:-translate-y-1 hover:shadow-xl"
+                className="group relative flex flex-col items-center overflow-hidden rounded-3xl border border-neutral-200 bg-surface p-7 text-center transition hover:-translate-y-1 hover:shadow-xl"
               >
+                <div
+                  className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradient}`}
+                />
                 <div
                   className={`pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${gradient} opacity-20 blur-2xl transition group-hover:opacity-40`}
                 />
-                <div className="flex items-center justify-between">
-                  {g.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={g.image_url}
-                      alt={g.name}
-                      className="h-14 w-14 rounded-2xl object-cover"
-                    />
-                  ) : (
-                    <span className="text-3xl">{g.emoji}</span>
-                  )}
-                  <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-neutral-500 transition group-hover:bg-indigo-600 group-hover:text-white">
-                    Singles →
+                {g.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={g.image_url}
+                    alt={g.name}
+                    className="relative h-20 w-20 rounded-2xl object-cover shadow-md"
+                  />
+                ) : (
+                  <span
+                    className={`relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br ${gradient} text-3xl shadow-md`}
+                  >
+                    {g.emoji}
                   </span>
-                </div>
-                <p className="mt-5 font-display text-base font-semibold">{g.name}</p>
-                <p className="mt-1 text-xs text-neutral-400">
-                  Singles, sobres y accesorios
-                </p>
+                )}
+                <p className="relative mt-4 font-display text-lg font-semibold">{g.name}</p>
+                <span
+                  className={`relative mt-3 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
+                    total > 0
+                      ? 'bg-neutral-100 text-neutral-500 transition group-hover:bg-indigo-600 group-hover:text-white'
+                      : 'bg-emerald-100 text-emerald-700'
+                  }`}
+                >
+                  {total > 0
+                    ? `${total} ${total === 1 ? 'producto' : 'productos'}`
+                    : 'Próximamente'}
+                </span>
+                <span className="relative mt-5 inline-flex items-center gap-1.5 rounded-full border border-indigo-500/40 px-4 py-1.5 text-sm font-semibold text-indigo-500 transition group-hover:border-indigo-500 group-hover:bg-indigo-500 group-hover:text-white">
+                  Ver juego
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
+                </span>
               </Link>
             )
           })}
