@@ -6,7 +6,7 @@ export async function getAllProducts(): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*), games(*)')
+    .select('*, category:categories(*), game:games(*)')
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (data ?? []) as Product[]
@@ -16,7 +16,7 @@ export async function getProducts(): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*), games(*)')
+    .select('*, category:categories(*), game:games(*)')
     .eq('active', true)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
@@ -47,11 +47,17 @@ export async function getProductsByCategory(
   slug: string,
 ): Promise<Product[]> {
   const supabase = await createClient()
+  const { data: cat } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('slug', slug)
+    .single()
+  if (!cat) return []
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*), games(*)')
+    .select('*, category:categories(*), game:games(*)')
     .eq('active', true)
-    .eq('categories.slug', slug)
+    .eq('category_id', cat.id)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (data ?? []) as Product[]
@@ -59,11 +65,17 @@ export async function getProductsByCategory(
 
 export async function getProductsByGame(slug: string): Promise<Product[]> {
   const supabase = await createClient()
+  const { data: game } = await supabase
+    .from('games')
+    .select('id')
+    .eq('slug', slug)
+    .single()
+  if (!game) return []
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*), games(*)')
+    .select('*, category:categories(*), game:games(*)')
     .eq('active', true)
-    .eq('games.slug', slug)
+    .eq('game_id', game.id)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (data ?? []) as Product[]
@@ -73,7 +85,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*), games(*)')
+    .select('*, category:categories(*), game:games(*)')
     .eq('active', true)
     .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
     .order('created_at', { ascending: false })
@@ -86,7 +98,7 @@ export async function getProduct(id: string): Promise<Product | null> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*), games(*)')
+    .select('*, category:categories(*), game:games(*)')
     .eq('id', id)
     .single()
   if (error) return null
@@ -114,7 +126,7 @@ export async function getWishlist(): Promise<Product[]> {
 
   const { data, error } = await supabase
     .from('wishlist_items')
-    .select('product:products(*, categories(*), games(*))')
+    .select('product:products(*, category:categories(*), game:games(*))')
     .eq('user_id', user.id)
   if (error) throw new Error(error.message)
   const items = (data ?? []) as unknown as { product: Product | null }[]
@@ -130,7 +142,7 @@ export async function getMyOrders(): Promise<OrderWithItems[]> {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, product:products(*))')
+    .select('*, order_items(*, product:products(*, category:categories(*), game:games(*)))')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
@@ -141,7 +153,7 @@ export async function getAllOrders(): Promise<OrderWithItems[]> {
   const supabase = await createClient()
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, product:products(*))')
+    .select('*, order_items(*, product:products(*, category:categories(*), game:games(*)))')
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (orders ?? []) as OrderWithItems[]
