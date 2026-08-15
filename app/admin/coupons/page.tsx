@@ -138,7 +138,7 @@ export default async function AdminCouponsPage() {
                   revalidatePath('/admin/coupons')
                 }}
               >
-                <button className="rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
+                <button className="rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40">
                   Borrar
                 </button>
               </form>

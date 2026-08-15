@@ -64,7 +64,7 @@ export default function AuthForm({
         </div>
         <button
           type="submit"
-          className="w-full rounded-md bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+          className="w-full rounded-md bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#24272c]"
         >
           {mode === 'login' ? 'Ingresar' : 'Registrarme'}
         </button>

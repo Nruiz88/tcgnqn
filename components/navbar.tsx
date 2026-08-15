@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useCart } from '@/lib/cart-context'
 import { usePathname } from 'next/navigation'
 import { isEnabled } from '@/lib/modules'
+import ThemeToggle from './theme-toggle'
 
 export default function Navbar() {
   const { count } = useCart()
@@ -22,10 +23,10 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-surface/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-950 text-sm text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0d0f14] text-sm text-white">
             🃏
           </span>
           <span className="text-lg font-bold tracking-tight">TCG NQN</span>
@@ -41,7 +42,8 @@ export default function Navbar() {
             />
           </div>
         </form>
-        <div className="flex items-center gap-5 sm:gap-6">
+        <div className="flex items-center gap-4 sm:gap-5">
+          <ThemeToggle />
           <Link
             href="/"
             className={`text-sm font-medium ${
@@ -74,7 +76,7 @@ export default function Navbar() {
           >
             Carrito
             {count > 0 && (
-              <span className="absolute -right-4 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-neutral-950 text-xs font-bold text-white">
+              <span className="absolute -right-4 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#0d0f14] text-xs font-bold text-white">
                 {count}
               </span>
             )}

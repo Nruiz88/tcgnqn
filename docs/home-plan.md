@@ -36,6 +36,7 @@ Guía de verificación para la página de inicio.
 - [x] Filtro por categoría real (consulta a tabla categories + `getProductsByCategory`)
 - [ ] Link WhatsApp real en el CTA (módulo payments.whatsapp)
 - [ ] Metadata/SEO (og tags, descripción por página)
+- [x] Tema oscuro (toggle en navbar, default dark, rampa neutral invertida vía vars)
 
 ## Notas
 

@@ -9,7 +9,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const outOfStock = product.stock <= 0
 
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-neutral-200 bg-white transition-shadow hover:shadow-md">
+    <div className="group relative overflow-hidden rounded-lg border border-neutral-200 bg-surface transition-shadow hover:shadow-md">
       {isEnabled('wishlist') && <WishlistButton productId={product.id} />}
       <Link href={`/product/${product.id}`}>
         <div className="relative aspect-square w-full overflow-hidden bg-neutral-100">
@@ -26,7 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           )}
           {product.game?.name && (
-            <span className="absolute left-2 top-2 rounded-md bg-neutral-950/80 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur">
+            <span className="absolute left-2 top-2 rounded-md bg-[#0d0f14]/80 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur">
               {product.game.emoji} {product.game.name}
             </span>
           )}

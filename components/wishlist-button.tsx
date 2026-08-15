@@ -22,7 +22,7 @@ export default function WishlistButton({ productId }: { productId: string }) {
       <button
         type="submit"
         aria-label="Guardar en favoritos"
-        className={`flex h-8 w-8 items-center justify-center rounded-full border bg-white/90 text-sm backdrop-blur transition hover:scale-110 ${
+        className={`flex h-8 w-8 items-center justify-center rounded-full border bg-surface/90 text-sm backdrop-blur transition hover:scale-110 ${
           active ? 'border-red-200 text-red-500' : 'border-neutral-200 text-neutral-400'
         }`}
       >

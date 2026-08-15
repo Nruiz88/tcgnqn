@@ -38,7 +38,7 @@ function SectionHeader({
       {href && (
         <Link
           href={href}
-          className="hidden shrink-0 rounded-full border border-neutral-300 px-5 py-2 text-sm font-medium text-neutral-900 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white sm:inline-block"
+          className="hidden shrink-0 rounded-full border border-neutral-300 px-5 py-2 text-sm font-medium text-neutral-900 transition hover:border-neutral-900 hover:bg-[#171a21] hover:text-white sm:inline-block"
         >
           Ver todo →
         </Link>
@@ -76,7 +76,7 @@ export default async function Home({
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-neutral-950 text-white">
+      <section className="relative overflow-hidden bg-[#0d0f14] text-white">
         <div className="bg-grid pointer-events-none absolute inset-0" />
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -left-32 top-0 h-[30rem] w-[30rem] rounded-full bg-indigo-600/30 blur-3xl" />
@@ -86,7 +86,7 @@ export default async function Home({
 
         <div className="relative mx-auto grid max-w-6xl gap-14 px-4 py-24 sm:py-32 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-surface/5 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
@@ -109,7 +109,7 @@ export default async function Home({
             <div className="mt-9 flex flex-wrap items-center gap-4">
               <Link
                 href="#productos"
-                className="group rounded-full bg-white px-7 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
+                className="group rounded-full bg-surface px-7 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
               >
                 Explorar catálogo{' '}
                 <span className="inline-block transition-transform group-hover:translate-x-1">
@@ -118,7 +118,7 @@ export default async function Home({
               </Link>
               <Link
                 href="#juegos"
-                className="rounded-full border border-white/20 bg-white/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
+                className="rounded-full border border-white/20 bg-surface/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-surface/10"
               >
                 Ver juegos
               </Link>
@@ -154,7 +154,7 @@ export default async function Home({
                 <p className="mt-4 font-display text-lg font-semibold">One Piece</p>
                 <p className="mt-1 text-xs text-white/60">Booster packs</p>
               </div>
-              <div className="absolute -bottom-4 left-16 rounded-2xl border border-white/10 bg-neutral-900/90 px-5 py-3 shadow-xl backdrop-blur">
+              <div className="absolute -bottom-4 left-16 rounded-2xl border border-white/10 bg-[#171a21]/90 px-5 py-3 shadow-xl backdrop-blur">
                 <p className="text-xs text-white/50">Nuevo en la tienda</p>
                 <p className="text-sm font-semibold">🫧 Lorcana · Tinta y glimmers</p>
               </div>
@@ -163,7 +163,7 @@ export default async function Home({
         </div>
 
         {/* Marquee */}
-        <div className="relative border-t border-white/10 bg-white/5 py-4 backdrop-blur">
+        <div className="relative border-t border-white/10 bg-surface/5 py-4 backdrop-blur">
           <div className="flex overflow-hidden">
             <div className="animate-marquee flex shrink-0 items-center gap-12 pr-12">
               {[...games, ...games].map((g, i) => (
@@ -177,12 +177,12 @@ export default async function Home({
       </section>
 
       {/* Features */}
-      <section className="border-b border-neutral-200 bg-white">
+      <section className="border-b border-neutral-200 bg-surface">
         <div className="mx-auto grid max-w-6xl gap-px overflow-hidden px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
             <div key={f.title} className="group p-2">
               <div className="rounded-2xl p-5 transition group-hover:bg-neutral-50">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-950 text-white transition group-hover:bg-indigo-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0d0f14] text-white transition group-hover:bg-indigo-600">
                   <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.6l7.3-7.3a1 1 0 0 1 1.4 0Z" clipRule="evenodd" />
                   </svg>
@@ -212,8 +212,8 @@ export default async function Home({
                 href={isActive ? '/#juegos' : `/?game=${g.slug}#juegos`}
                 className={`group relative overflow-hidden rounded-3xl border p-6 transition hover:-translate-y-1 hover:shadow-xl ${
                   isActive
-                    ? 'border-neutral-900 bg-neutral-950 text-white'
-                    : 'border-neutral-200 bg-white'
+                    ? 'border-neutral-900 bg-[#0d0f14] text-white'
+                    : 'border-neutral-200 bg-surface'
                 }`}
               >
                 <div
@@ -224,7 +224,7 @@ export default async function Home({
                   <span
                     className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${
                       isActive
-                        ? 'bg-white/15 text-white'
+                        ? 'bg-surface/15 text-white'
                         : 'bg-neutral-100 text-neutral-500'
                     }`}
                   >
@@ -269,8 +269,8 @@ export default async function Home({
                   href={href}
                   className={`group flex items-center justify-between rounded-3xl border p-6 transition hover:-translate-y-1 hover:shadow-lg ${
                     isActive
-                      ? 'border-neutral-900 bg-neutral-950 text-white'
-                      : 'border-neutral-200 bg-white'
+                      ? 'border-neutral-900 bg-[#0d0f14] text-white'
+                      : 'border-neutral-200 bg-surface'
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -341,7 +341,7 @@ export default async function Home({
 
       {/* CTA final */}
       <section className="mx-auto max-w-6xl px-4 pb-20">
-        <div className="relative overflow-hidden rounded-3xl bg-neutral-950 px-6 py-16 text-center text-white sm:px-16">
+        <div className="relative overflow-hidden rounded-3xl bg-[#0d0f14] px-6 py-16 text-center text-white sm:px-16">
           <div className="bg-grid pointer-events-none absolute inset-0" />
           <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-indigo-600/40 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-fuchsia-600/40 blur-3xl" />
@@ -358,7 +358,7 @@ export default async function Home({
             </p>
             <Link
               href="/login"
-              className="mt-8 inline-block rounded-full bg-white px-8 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
+              className="mt-8 inline-block rounded-full bg-surface px-8 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
             >
               Hacé tu pedido →
             </Link>

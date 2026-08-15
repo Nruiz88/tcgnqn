@@ -60,7 +60,7 @@ export default function CartPage() {
                   </div>
                   <button
                     onClick={() => removeItem(item.product.id)}
-                    className="text-sm text-neutral-400 hover:text-red-600"
+                    className="text-sm text-neutral-400 hover:text-red-600 dark:hover:text-red-400"
                   >
                     Quitar
                   </button>
@@ -98,7 +98,7 @@ export default function CartPage() {
           </div>
           <Link
             href="/checkout"
-            className="mt-6 block rounded-md bg-black px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-neutral-800"
+            className="mt-6 block rounded-md bg-black px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#24272c]"
           >
             Ir a checkout
           </Link>

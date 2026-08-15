@@ -1,16 +1,40 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: #ffffff;
+}
+
+@theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-space-grotesk);
+}
+
+:root.dark {
+  --background: #0a0b0f;
+  --foreground: #e7e9ee;
+  --color-surface: #13161b;
+  --color-neutral-50: #0e1116;
+  --color-neutral-100: #14171d;
+  --color-neutral-200: #1d212a;
+  --color-neutral-300: #2b303c;
+  --color-neutral-400: #4a5160;
+  --color-neutral-500: #8791a4;
+  --color-neutral-600: #a9b1c1;
+  --color-neutral-700: #c4cad6;
+  --color-neutral-800: #d9dde6;
+  --color-neutral-900: #e9ecf1;
+  --color-neutral-950: #f5f6f9;
+  color-scheme: dark;
 }
 
 body {

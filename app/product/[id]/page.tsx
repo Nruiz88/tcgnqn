@@ -52,7 +52,7 @@ export default async function ProductPage({
                 {product.stock} disponibles
               </p>
             ) : (
-              <p className="text-sm font-medium text-red-600">Sin stock</p>
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">Sin stock</p>
             )}
           </div>
           <AddToCartButton

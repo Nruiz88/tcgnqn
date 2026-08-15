@@ -102,7 +102,7 @@ export default async function AdminGamesPage() {
                 await deleteGame(g.id)
                 revalidatePath('/admin/games')
               }}
-              className="rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+              className="rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
             >
               Borrar
             </button>

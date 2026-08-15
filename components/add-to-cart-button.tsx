@@ -27,7 +27,7 @@ export default function AddToCartButton({
       <button
         onClick={handleClick}
         disabled={disabled}
-        className="flex-1 rounded-md bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex-1 rounded-md bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#24272c] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {added ? '✓ Agregado' : disabled ? 'Sin stock' : 'Agregar al carrito'}
       </button>

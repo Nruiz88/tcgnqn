@@ -269,7 +269,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-md bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-50"
+            className="w-full rounded-md bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#24272c] disabled:opacity-50"
           >
             {method === 'whatsapp'
               ? 'Enviar pedido por WhatsApp'

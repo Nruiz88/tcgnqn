@@ -67,7 +67,7 @@ export default async function AdminOrdersPage() {
                   {STATUS_LABELS[order.status]}
                 </span>
                 {order.discount > 0 && (
-                  <p className="mt-1 text-xs text-green-700">
+                  <p className="mt-1 text-xs text-green-700 dark:text-green-400">
                     Descuento aplicado: {formatPrice(order.discount)}
                   </p>
                 )}
@@ -102,7 +102,7 @@ export default async function AdminOrdersPage() {
                     href={`https://wa.me/${order.shipping_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${order.shipping_name}! Tu pedido en TCG NQN está ${STATUS_LABELS[order.status].toLowerCase()}.`)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-2 inline-block rounded-md border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50"
+                    className="mt-2 inline-block rounded-md border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/40"
                   >
                     WhatsApp al cliente
                   </a>
