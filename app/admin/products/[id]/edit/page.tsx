@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getCategories } from '@/lib/data'
+import { getCategories, getGames } from '@/lib/data'
 import ProductForm from '@/components/product-form'
 
 export const dynamic = 'force-dynamic'
@@ -12,8 +12,9 @@ export default async function EditProductPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
-  const [categories, { data: product }] = await Promise.all([
+  const [categories, games, { data: product }] = await Promise.all([
     getCategories(),
+    getGames(),
     supabase.from('products').select('*').eq('id', id).single(),
   ])
   if (!product) notFound()
@@ -25,6 +26,7 @@ export default async function EditProductPage({
         <ProductForm
           action="update"
           categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+          games={games.map((g) => ({ id: g.id, name: g.name, emoji: g.emoji }))}
           initial={{
             id: product.id,
             name: product.name,
@@ -33,6 +35,7 @@ export default async function EditProductPage({
             stock: product.stock,
             image_url: product.image_url,
             category_id: product.category_id,
+            game_id: product.game_id,
           }}
         />
       </div>

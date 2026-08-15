@@ -7,6 +7,7 @@ export default function ProductForm({
   initial,
   action,
   categories,
+  games,
 }: {
   initial?: {
     id: string
@@ -16,9 +17,11 @@ export default function ProductForm({
     stock: number
     image_url: string | null
     category_id: string | null
+    game_id: string | null
   }
   action: 'create' | 'update'
   categories: { id: string; name: string }[]
+  games: { id: string; name: string; emoji: string | null }[]
 }) {
   const router = useRouter()
 
@@ -100,6 +103,22 @@ export default function ProductForm({
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="text-sm font-medium">Juego</label>
+        <select
+          name="game_id"
+          defaultValue={initial?.game_id ?? ''}
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        >
+          <option value="">Sin juego</option>
+          {games.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.emoji ? `${g.emoji} ` : ''}
+              {g.name}
             </option>
           ))}
         </select>

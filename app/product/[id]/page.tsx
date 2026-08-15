@@ -32,7 +32,12 @@ export default async function ProductPage({
           )}
         </div>
         <div>
-          <h1 className="text-2xl font-bold">{product.name}</h1>
+          {product.game?.name && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-700">
+              {product.game.emoji} {product.game.name}
+            </span>
+          )}
+          <h1 className="mt-2 text-2xl font-bold">{product.name}</h1>
           <p className="mt-2 text-xl font-semibold">
             {formatPrice(product.price)}
           </p>

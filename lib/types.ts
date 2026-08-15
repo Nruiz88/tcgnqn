@@ -14,6 +14,15 @@ export type Category = {
   created_at: string
 }
 
+export type Game = {
+  id: string
+  name: string
+  slug: string
+  emoji: string | null
+  color: string | null
+  created_at: string
+}
+
 export type Product = {
   id: string
   name: string
@@ -24,6 +33,8 @@ export type Product = {
   active: boolean
   category_id: string | null
   category?: Category | null
+  game_id: string | null
+  game?: Game | null
   created_at: string
 }
 

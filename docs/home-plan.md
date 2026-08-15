@@ -4,7 +4,12 @@ Guía de verificación para la página de inicio.
 
 ## Interfaz
 
-- [x] Hero oscuro con gradiente, badge, CTAs (Ver productos / Crear cuenta)
+- [x] Hero oscuro con gradiente, badge, CTAs (Explorar juegos / Ver productos)
+- [x] Hub de juegos TCG (8 juegos con gradiente, filtro `?game=`)
+- [x] Filtro combinado juego + categoría
+- [x] Badge de juego en tarjetas (ProductCard)
+- [x] Badge de stock bajo / agotado en tarjetas
+- [x] CRUD de juegos en admin (`/admin/games`) + selector en producto
 - [x] Features (4 sellos de confianza)
 - [x] Categorías (4 tarjetas con emoji)
 - [x] Productos destacados (grid, hasta 8)
@@ -13,8 +18,10 @@ Guía de verificación para la página de inicio.
 - [x] Barra de búsqueda en navbar (base: search, desktop + mobile)
 - [x] Filtrado real por categoría (tabla categories + query param `?cat=`)
 - [x] Corazón de wishlist en tarjetas (módulo wishlist)
-- [ ] Badge de stock bajo / agotado en tarjetas
-- [ ] Sección "Novedades"
+- [x] Badge de stock bajo / agotado en tarjetas
+- [x] Sección "Novedades" (recién llegados)
+- [x] Tipografía moderna (Space Grotesk en títulos + Geist en texto)
+- [x] Hero con patrón de cuadrícula, tarjetas flotantes y marquee de juegos
 - [ ] Página "Ver todo" con paginación
 - [x] Campo de cupón en checkout (módulo coupons)
 - [x] Selección de método de pago en checkout (transferencia / WhatsApp / MP)

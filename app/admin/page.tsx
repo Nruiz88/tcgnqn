@@ -45,6 +45,7 @@ export default async function AdminProductsPage() {
                 <p className="font-medium">{product.name}</p>
                 <p className="text-sm text-neutral-500">
                   {formatPrice(product.price)} · Stock: {product.stock}
+                  {product.game?.name && ` · ${product.game.emoji} ${product.game.name}`}
                 </p>
               </div>
             </div>

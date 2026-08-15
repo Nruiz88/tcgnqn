@@ -226,6 +226,7 @@ export async function createProduct(formData: FormData) {
   const stock = Number(formData.get('stock') ?? 0)
   const image_url = String(formData.get('image_url') ?? '')
   const category_id = String(formData.get('category_id') ?? '')
+  const game_id = String(formData.get('game_id') ?? '')
 
   const { error } = await supabase.from('products').insert({
     name,
@@ -234,6 +235,7 @@ export async function createProduct(formData: FormData) {
     stock,
     image_url: image_url || null,
     category_id: category_id || null,
+    game_id: game_id || null,
     active: true,
   })
   if (error) return { error: error.message }
@@ -248,6 +250,7 @@ export async function updateProduct(id: string, formData: FormData) {
   const stock = Number(formData.get('stock') ?? 0)
   const image_url = String(formData.get('image_url') ?? '')
   const category_id = String(formData.get('category_id') ?? '')
+  const game_id = String(formData.get('game_id') ?? '')
 
   const { error } = await supabase
     .from('products')
@@ -258,6 +261,7 @@ export async function updateProduct(id: string, formData: FormData) {
       stock,
       image_url: image_url || null,
       category_id: category_id || null,
+      game_id: game_id || null,
     })
     .eq('id', id)
   if (error) return { error: error.message }
@@ -328,6 +332,56 @@ export async function updateCategory(id: string, formData: FormData) {
 export async function deleteCategory(id: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('categories').delete().eq('id', id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+export async function createGame(formData: FormData) {
+  const supabase = await createClient()
+  const name = String(formData.get('name') ?? '').trim()
+  const emoji = String(formData.get('emoji') ?? '').trim()
+  const color = String(formData.get('color') ?? '').trim()
+  if (!name) return { error: 'Nombre requerido' }
+
+  const slug = name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  const { error } = await supabase
+    .from('games')
+    .insert({ name, slug, emoji: emoji || null, color: color || null })
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+export async function updateGame(id: string, formData: FormData) {
+  const supabase = await createClient()
+  const name = String(formData.get('name') ?? '').trim()
+  const emoji = String(formData.get('emoji') ?? '').trim()
+  const color = String(formData.get('color') ?? '').trim()
+  if (!name) return { error: 'Nombre requerido' }
+
+  const slug = name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  const { error } = await supabase
+    .from('games')
+    .update({ name, slug, emoji: emoji || null, color: color || null })
+    .eq('id', id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+export async function deleteGame(id: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('games').delete().eq('id', id)
   if (error) return { error: error.message }
   return { ok: true }
 }

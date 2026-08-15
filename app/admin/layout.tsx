@@ -42,6 +42,12 @@ export default async function AdminLayout({
         >
           Categorías
         </a>
+        <a
+          href="/admin/games"
+          className="text-sm font-medium hover:text-neutral-600"
+        >
+          Juegos
+        </a>
         {isEnabled('coupons') && (
           <a
             href="/admin/coupons"

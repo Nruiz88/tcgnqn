@@ -1,12 +1,12 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
-import type { Category, Coupon, Order, OrderItem, Product } from '@/lib/types'
+import type { Category, Coupon, Game, Order, OrderItem, Product } from '@/lib/types'
 
 export async function getAllProducts(): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*)')
+    .select('*, categories(*), games(*)')
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (data ?? []) as Product[]
@@ -16,7 +16,7 @@ export async function getProducts(): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*)')
+    .select('*, categories(*), games(*)')
     .eq('active', true)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
@@ -33,15 +33,37 @@ export async function getCategories(): Promise<Category[]> {
   return (data ?? []) as Category[]
 }
 
+export async function getGames(): Promise<Game[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('games')
+    .select('*')
+    .order('name')
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Game[]
+}
+
 export async function getProductsByCategory(
   slug: string,
 ): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*)')
+    .select('*, categories(*), games(*)')
     .eq('active', true)
     .eq('categories.slug', slug)
+    .order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Product[]
+}
+
+export async function getProductsByGame(slug: string): Promise<Product[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, categories(*), games(*)')
+    .eq('active', true)
+    .eq('games.slug', slug)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (data ?? []) as Product[]
@@ -51,7 +73,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*, categories(*)')
+    .select('*, categories(*), games(*)')
     .eq('active', true)
     .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
     .order('created_at', { ascending: false })
@@ -64,7 +86,7 @@ export async function getProduct(id: string): Promise<Product | null> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('products')
-    .select('*')
+    .select('*, categories(*), games(*)')
     .eq('id', id)
     .single()
   if (error) return null
@@ -92,7 +114,7 @@ export async function getWishlist(): Promise<Product[]> {
 
   const { data, error } = await supabase
     .from('wishlist_items')
-    .select('product(*, categories(*))')
+    .select('product(*, categories(*), games(*))')
     .eq('user_id', user.id)
   if (error) throw new Error(error.message)
   const items = (data ?? []) as unknown as { product: Product | null }[]
