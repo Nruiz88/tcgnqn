@@ -75,7 +75,12 @@ export default async function Home({
   })
 
   const featured = products.slice(0, 8)
-  const latest = allProducts.slice().reverse().slice(0, 4)
+  // Recién llegados: solo productos normales, sin cartas individuales
+  const latest = allProducts
+    .filter((p) => !isCard(p))
+    .slice()
+    .reverse()
+    .slice(0, 4)
 
   // Colecciones de singles, organizadas como filas de cartas (estilo PokeArgentum)
   const singles = allProducts.filter((p) => p.category?.slug === 'cartas')
