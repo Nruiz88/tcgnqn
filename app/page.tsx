@@ -217,7 +217,16 @@ export default async function Home({
                   className={`pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${gradient} opacity-20 blur-2xl transition group-hover:opacity-40`}
                 />
                 <div className="flex items-center justify-between">
-                  <span className="text-3xl">{g.emoji}</span>
+                  {g.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={g.image_url}
+                      alt={g.name}
+                      className="h-14 w-14 rounded-2xl object-cover"
+                    />
+                  ) : (
+                    <span className="text-3xl">{g.emoji}</span>
+                  )}
                   <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-neutral-500 transition group-hover:bg-indigo-600 group-hover:text-white">
                     Singles →
                   </span>

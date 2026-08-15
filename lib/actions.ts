@@ -359,12 +359,52 @@ export async function deleteCategory(id: string) {
   return { ok: true }
 }
 
+async function uploadGameImage(
+  file: File,
+): Promise<{ publicUrl: string; error?: string }> {
+  const supabase = await createClient()
+  const ext = (file.name.split('.').pop() ?? 'png')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+  const path = `${crypto.randomUUID()}.${ext}`
+  const bytes = await file.arrayBuffer()
+  const { error } = await supabase.storage
+    .from('game-images')
+    .upload(path, bytes, { contentType: file.type || 'image/png' })
+  if (error) return { publicUrl: '', error: error.message }
+  const { data } = supabase.storage.from('game-images').getPublicUrl(path)
+  return { publicUrl: data.publicUrl }
+}
+
+async function deleteGameImage(publicUrl: string) {
+  const supabase = await createClient()
+  const path = publicUrl.split('/object/public/game-images/')[1]
+  if (!path) return
+  await supabase.storage.from('game-images').remove([path])
+}
+
+async function resolveGameImage(
+  formData: FormData,
+): Promise<{ imageUrl: string | null; error?: string }> {
+  const file = formData.get('image')
+  if (file instanceof File && file.size > 0) {
+    const { publicUrl, error } = await uploadGameImage(file)
+    if (error) return { imageUrl: null, error }
+    return { imageUrl: publicUrl }
+  }
+  const url = String(formData.get('image_url') ?? '').trim()
+  return { imageUrl: url || null }
+}
+
 export async function createGame(formData: FormData) {
   const supabase = await createClient()
   const name = String(formData.get('name') ?? '').trim()
   const emoji = String(formData.get('emoji') ?? '').trim()
   const color = String(formData.get('color') ?? '').trim()
   if (!name) return { error: 'Nombre requerido' }
+
+  const { imageUrl, error: imageError } = await resolveGameImage(formData)
+  if (imageError) return { error: imageError }
 
   const slug = name
     .toLowerCase()
@@ -375,7 +415,13 @@ export async function createGame(formData: FormData) {
 
   const { error } = await supabase
     .from('games')
-    .insert({ name, slug, emoji: emoji || null, color: color || null })
+    .insert({
+      name,
+      slug,
+      emoji: emoji || null,
+      color: color || null,
+      image_url: imageUrl,
+    })
   if (error) return { error: error.message }
   return { ok: true }
 }
@@ -387,6 +433,15 @@ export async function updateGame(id: string, formData: FormData) {
   const color = String(formData.get('color') ?? '').trim()
   if (!name) return { error: 'Nombre requerido' }
 
+  const { imageUrl, error: imageError } = await resolveGameImage(formData)
+  if (imageError) return { error: imageError }
+
+  const { data: current } = await supabase
+    .from('games')
+    .select('image_url')
+    .eq('id', id)
+    .single()
+
   const slug = name
     .toLowerCase()
     .normalize('NFD')
@@ -396,9 +451,13 @@ export async function updateGame(id: string, formData: FormData) {
 
   const { error } = await supabase
     .from('games')
-    .update({ name, slug, emoji: emoji || null, color: color || null })
+    .update({ name, slug, emoji: emoji || null, color: color || null, image_url: imageUrl })
     .eq('id', id)
   if (error) return { error: error.message }
+
+  if (current?.image_url && current.image_url !== imageUrl) {
+    await deleteGameImage(current.image_url)
+  }
   return { ok: true }
 }
 

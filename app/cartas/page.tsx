@@ -120,6 +120,7 @@ export default async function CartasPage({
           slug: g.slug,
           name: g.name,
           emoji: g.emoji,
+          image_url: g.image_url,
         }))}
         collections={collections}
         game={game}

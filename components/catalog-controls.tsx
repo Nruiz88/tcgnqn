@@ -4,7 +4,13 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-type Game = { id: string; slug: string; name: string; emoji: string | null }
+type Game = {
+  id: string
+  slug: string
+  name: string
+  emoji: string | null
+  image_url: string | null
+}
 
 export type CollectionEntry = {
   key: string
@@ -109,7 +115,19 @@ export default function CatalogControls({
                 : 'border-neutral-300 text-neutral-600 hover:bg-neutral-100'
             }`}
           >
-            {g.emoji} {g.name}
+            <span className="flex items-center gap-1.5">
+              {g.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={g.image_url}
+                  alt=""
+                  className="h-5 w-5 rounded-full object-cover"
+                />
+              ) : (
+                <span>{g.emoji}</span>
+              )}
+              {g.name}
+            </span>
           </Link>
         ))}
       </div>

@@ -20,6 +20,7 @@ export type Game = {
   slug: string
   emoji: string | null
   color: string | null
+  image_url: string | null
   created_at: string
 }
 
