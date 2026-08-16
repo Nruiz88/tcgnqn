@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { Icon } from '@/components/admin-ui'
 
 const LABELS: [RegExp, string][] = [
+  [/^\/admin\/accesorios\/new/, 'Accesorios / Nuevo accesorio'],
+  [/^\/admin\/accesorios/, 'Accesorios'],
   [/^\/admin\/cartas\/new/, 'Cartas / Nueva carta'],
   [/^\/admin\/cartas\/.+\/edit/, 'Cartas / Editar carta'],
   [/^\/admin\/cartas/, 'Cartas'],

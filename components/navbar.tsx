@@ -67,6 +67,16 @@ export default function Navbar() {
           >
             Cartas
           </Link>
+          <Link
+            href="/?cat=accesorios"
+            className={`text-sm font-medium ${
+              pathname === '/'
+                ? 'text-neutral-900'
+                : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            Accesorios
+          </Link>
           {isEnabled('wishlist') && (
             <Link
               href="/favoritos"

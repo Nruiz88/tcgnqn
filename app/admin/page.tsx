@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getAllProducts, getAllOrders } from '@/lib/data'
 import { formatPrice } from '@/lib/format'
-import { toggleProduct } from '@/lib/actions'
+import { toggleProduct, toggleFeatured, deleteProduct } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/orders'
 import { Icon, btnSecondary, type IconName } from '@/components/admin-ui'
@@ -226,6 +226,36 @@ export default async function AdminDashboardPage() {
                       <form
                         action={async () => {
                           'use server'
+                          await toggleFeatured(product.id, !product.featured)
+                          revalidatePath('/admin')
+                        }}
+                      >
+                        <button
+                          title={
+                            product.featured
+                              ? 'Quitar de destacados'
+                              : 'Destacar en la home'
+                          }
+                          className={`${btnSecondary} ${
+                            product.featured
+                              ? '!border-amber-400/60 !text-amber-600 dark:!text-amber-400'
+                              : ''
+                          }`}
+                        >
+                          <Icon
+                            name="star"
+                            className={`h-3.5 w-3.5 ${
+                              product.featured ? 'fill-amber-400 text-amber-400' : ''
+                            }`}
+                          />
+                          <span className="hidden sm:inline">
+                            {product.featured ? 'Destacado' : 'Destacar'}
+                          </span>
+                        </button>
+                      </form>
+                      <form
+                        action={async () => {
+                          'use server'
                           await toggleProduct(product.id, !product.active)
                           revalidatePath('/admin')
                         }}
@@ -252,6 +282,21 @@ export default async function AdminDashboardPage() {
                         <Icon name="pencil" className="h-3.5 w-3.5" />
                         <span className="hidden sm:inline">Editar</span>
                       </Link>
+                      <form
+                        action={async () => {
+                          'use server'
+                          await deleteProduct(product.id)
+                          revalidatePath('/admin')
+                        }}
+                      >
+                        <button
+                          title="Borrar producto"
+                          className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20"
+                        >
+                          <Icon name="trash" className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Borrar</span>
+                        </button>
+                      </form>
                     </div>
                   </div>
                 )

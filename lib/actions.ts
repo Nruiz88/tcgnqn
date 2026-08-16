@@ -684,6 +684,16 @@ export async function toggleProduct(id: string, active: boolean) {
   return { ok: true }
 }
 
+export async function toggleFeatured(id: string, featured: boolean) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('products')
+    .update({ featured })
+    .eq('id', id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
 export async function deleteProduct(id: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('products').delete().eq('id', id)

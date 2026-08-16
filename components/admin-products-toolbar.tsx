@@ -30,10 +30,14 @@ export default function AdminProductsToolbar({
   total,
   pageCount,
   games,
+  nounSingular = 'carta',
+  nounPlural = 'cartas',
 }: {
   total: number
   pageCount: number
   games: Game[]
+  nounSingular?: string
+  nounPlural?: string
 }) {
   const [q, setQ] = useQueryState('q', { defaultValue: '', history: 'replace' })
   const [game, setGame] = useQueryState('game', {
@@ -195,7 +199,7 @@ export default function AdminProductsToolbar({
         <p className="text-xs text-neutral-500">
           {total === 0
             ? 'Sin resultados'
-            : `${total} ${total === 1 ? 'carta' : 'cartas'}${
+            : `${total} ${total === 1 ? nounSingular : nounPlural}${
                 pageCount > 1
                   ? ` · página ${current} de ${pageCount}`
                   : ''

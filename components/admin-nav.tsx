@@ -23,6 +23,7 @@ function groups(): NavGroup[] {
       items: [
         { href: '/admin', label: 'Productos', icon: 'package' },
         { href: '/admin/cartas', label: 'Cartas', icon: 'fileText' },
+        { href: '/admin/accesorios', label: 'Accesorios', icon: 'folder' },
         { href: '/admin/categories', label: 'Categorías', icon: 'tag' },
         { href: '/admin/games', label: 'Juegos', icon: 'layers' },
       ],

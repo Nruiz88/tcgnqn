@@ -9,11 +9,82 @@ import { POKEMON_ERAS, findPokemonSet } from '@/lib/pokemon-sets'
 export const dynamic = 'force-dynamic'
 
 const features = [
-  { title: 'Envío seguro', desc: 'Protección rígida y seguimiento en todo el país.' },
-  { title: 'Cartas verificadas', desc: 'Revisamos calidad y estado antes de enviar.' },
-  { title: 'Pago coordinado', desc: 'Arreglamos el pago por WhatsApp al confirmar.' },
-  { title: 'Colección curada', desc: 'Solo productos que elegimos para tu binder.' },
+  {
+    title: 'Envío seguro',
+    desc: 'Protección rígida y seguimiento en todo el país.',
+    icon: 'truck',
+    tint: 'from-sky-500/15 to-sky-500/5 text-sky-400 ring-sky-500/25',
+    glow: 'group-hover:shadow-sky-500/25',
+  },
+  {
+    title: 'Cartas verificadas',
+    desc: 'Revisamos calidad y estado antes de enviar.',
+    icon: 'shield',
+    tint: 'from-emerald-500/15 to-emerald-500/5 text-emerald-400 ring-emerald-500/25',
+    glow: 'group-hover:shadow-emerald-500/25',
+  },
+  {
+    title: 'Pago coordinado',
+    desc: 'Arreglamos el pago por WhatsApp al confirmar.',
+    icon: 'chat',
+    tint: 'from-violet-500/15 to-violet-500/5 text-violet-400 ring-violet-500/25',
+    glow: 'group-hover:shadow-violet-500/25',
+  },
+  {
+    title: 'Colección curada',
+    desc: 'Solo productos que elegimos para tu binder.',
+    icon: 'star',
+    tint: 'from-amber-500/15 to-amber-500/5 text-amber-400 ring-amber-500/25',
+    glow: 'group-hover:shadow-amber-500/25',
+  },
 ]
+
+function FeatureIcon({ name }: { name: string }) {
+  const common = {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+  }
+  switch (name) {
+    case 'truck':
+      return (
+        <svg {...common} className="h-6 w-6">
+          <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+          <path d="M15 18h-5" />
+          <path d="M15 8h3.6a2 2 0 0 1 1.8 1.1l2.1 4A2 2 0 0 1 23 14v3a1 1 0 0 1-1 1h-1.5" />
+          <circle cx="7" cy="18" r="2" />
+          <circle cx="17" cy="18" r="2" />
+        </svg>
+      )
+    case 'shield':
+      return (
+        <svg {...common} className="h-6 w-6">
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      )
+    case 'chat':
+      return (
+        <svg {...common} className="h-6 w-6">
+          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+          <path d="M8 12h.01" />
+          <path d="M12 12h.01" />
+          <path d="M16 12h.01" />
+        </svg>
+      )
+    case 'star':
+      return (
+        <svg {...common} className="h-6 w-6">
+          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+        </svg>
+      )
+    default:
+      return null
+  }
+}
 
 function SectionHeader({
   kicker,
@@ -74,13 +145,23 @@ export default async function Home({
     return true
   })
 
-  const featured = products.slice(0, 8)
+  // Destacados: los marcados como destacados desde el admin (sin cartas,
+  // que tienen su propia sección). Si no hay ninguno marcado, usamos los
+  // primeros productos no-cartas para no dejar la sección vacía.
+  const markedFeatured = products.filter((p) => p.featured && !isCard(p))
+  const featured =
+    markedFeatured.length > 0
+      ? markedFeatured.slice(0, 8)
+      : products.filter((p) => !isCard(p)).slice(0, 8)
   // Recién llegados: solo productos normales, sin cartas individuales
   const latest = allProducts
     .filter((p) => !isCard(p))
     .slice()
     .reverse()
     .slice(0, 4)
+
+  // Accesorios: sección única en la home (solo cuando no hay filtros)
+  const accesorios = allProducts.filter((p) => p.category?.slug === 'accesorios')
 
   // Colecciones de singles, organizadas como filas de cartas (estilo PokeArgentum)
   const singles = allProducts.filter((p) => p.category?.slug === 'cartas')
@@ -226,17 +307,26 @@ export default async function Home({
 
       {/* Features */}
       <section className="border-b border-neutral-200 bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-px overflow-hidden px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-6xl gap-4 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
-            <div key={f.title} className="group p-2">
-              <div className="rounded-2xl p-5 transition group-hover:bg-neutral-50">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0d0f14] text-white transition group-hover:bg-indigo-600">
-                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.6l7.3-7.3a1 1 0 0 1 1.4 0Z" clipRule="evenodd" />
-                  </svg>
+            <div key={f.title} className="group relative">
+              <div
+                className={`relative h-full overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-b p-5 ring-1 ring-inset transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl dark:border-neutral-800/60 ${f.tint} ${f.glow}`}
+              >
+                <div
+                  className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 ${f.tint}`}
+                />
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${f.tint} ring-1 ring-inset transition-transform duration-300 group-hover:scale-110`}
+                >
+                  <FeatureIcon name={f.icon} />
                 </div>
-                <p className="mt-4 text-sm font-semibold text-neutral-900">{f.title}</p>
-                <p className="mt-1 text-xs leading-relaxed text-neutral-500">{f.desc}</p>
+                <p className="mt-4 font-display text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                  {f.title}
+                </p>
+                <p className="mt-1.5 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+                  {f.desc}
+                </p>
               </div>
             </div>
           ))}
@@ -244,13 +334,8 @@ export default async function Home({
       </section>
 
       {/* Juegos TCG */}
-      <section id="juegos" className="mx-auto max-w-6xl px-4 py-20">
-        <SectionHeader
-          kicker="Juegos"
-          title="Elegí tu juego"
-          subtitle="Singles, sobres, cajas y accesorios para tu juego favorito"
-        />
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <section id="juegos" className="mx-auto max-w-6xl px-4 pt-8">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {games.map((g) => {
             const gradient = g.color ?? 'from-neutral-500 to-neutral-700'
             const total = allProducts.filter((p) => p.game?.slug === g.slug).length
@@ -371,13 +456,9 @@ export default async function Home({
           </p>
         ) : (
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {featured.map((product) =>
-              isCard(product) ? (
-                <CardTile key={product.id} product={product} />
-              ) : (
-                <ProductCard key={product.id} product={product} />
-              ),
-            )}
+            {featured.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         )}
       </section>
@@ -399,6 +480,23 @@ export default async function Home({
                 <ProductCard key={product.id} product={product} />
               ),
             )}
+          </div>
+        </section>
+      )}
+
+      {/* Accesorios: sección única */}
+      {!activeGame && !activeCategory && accesorios.length > 0 && (
+        <section id="accesorios" className="mx-auto max-w-6xl px-4 pb-20">
+          <SectionHeader
+            kicker="Accesorios"
+            title="Accesorios para tu colección"
+            subtitle="Fundas, binders, toploaders y todo lo necesario para cuidar tus cartas"
+            href="/?cat=accesorios"
+          />
+          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {accesorios.slice(0, 8).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </section>
       )}

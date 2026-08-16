@@ -3,8 +3,18 @@ import { getCategories, getGames } from '@/lib/data'
 import ProductForm from '@/components/product-form'
 import { Icon, PageHeader, btnSecondary } from '@/components/admin-ui'
 
-export default async function NewProductPage() {
-  const [categories, games] = await Promise.all([getCategories(), getGames()])
+export default async function NewProductPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cat?: string }>
+}) {
+  const [{ cat }, categories, games] = await Promise.all([
+    searchParams,
+    getCategories(),
+    getGames(),
+  ])
+
+  const defaultCategoryId = categories.find((c) => c.id === cat)?.id
 
   return (
     <div>
@@ -21,6 +31,7 @@ export default async function NewProductPage() {
       <div className="mt-6">
         <ProductForm
           action="create"
+          defaultCategoryId={defaultCategoryId}
           categories={categories.map((c) => ({ id: c.id, name: c.name }))}
           games={games.map((g) => ({ id: g.id, name: g.name, emoji: g.emoji }))}
         />

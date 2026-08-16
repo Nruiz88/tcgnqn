@@ -32,6 +32,7 @@ export type Product = {
   image_url: string | null
   stock: number
   active: boolean
+  featured: boolean
   category_id: string | null
   category?: Category | null
   game_id: string | null

@@ -37,6 +37,7 @@ export default function ProductForm({
   action,
   categories,
   games,
+  defaultCategoryId,
 }: {
   initial?: {
     id: string
@@ -51,6 +52,7 @@ export default function ProductForm({
   action: 'create' | 'update'
   categories: { id: string; name: string }[]
   games: { id: string; name: string; emoji: string | null }[]
+  defaultCategoryId?: string | null
 }) {
   const router = useRouter()
 
@@ -153,7 +155,7 @@ export default function ProductForm({
             <label className={labelCls}>Categoría</label>
             <select
               name="category_id"
-              defaultValue={initial?.category_id ?? ''}
+              defaultValue={initial?.category_id ?? defaultCategoryId ?? ''}
               className={inputCls}
             >
               <option value="">Sin categoría</option>
