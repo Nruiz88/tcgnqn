@@ -2,15 +2,62 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { Suspense, useState } from 'react'
 import { useCart } from '@/lib/cart-context'
-import { usePathname } from 'next/navigation'
 import { isEnabled } from '@/lib/modules'
 
-export default function Navbar() {
+function NavLinks() {
   const { count } = useCart()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const cat = searchParams.get('cat')
+  const isHome = pathname === '/'
+
+  const links = [
+    { href: '/', label: 'Tienda', active: isHome && !cat },
+    { href: '/cartas', label: 'Cartas', active: pathname === '/cartas' },
+    {
+      href: '/?cat=accesorios',
+      label: 'Accesorios',
+      active: isHome && cat === 'accesorios',
+    },
+    ...(isEnabled('wishlist')
+      ? [{ href: '/favoritos', label: 'Favoritos', active: pathname === '/favoritos' }]
+      : []),
+    { href: '/cart', label: 'Carrito', active: pathname === '/cart' },
+    { href: '/account', label: 'Cuenta', active: pathname === '/account' },
+  ]
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:gap-x-5">
+      {links.map((l) => (
+        <Link
+          key={l.href}
+          href={l.href}
+          aria-current={l.active ? 'page' : undefined}
+          className={`relative text-sm font-medium transition ${
+            l.active
+              ? 'text-neutral-900 dark:text-neutral-100'
+              : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100'
+          }`}
+        >
+          {l.label}
+          {l.href === '/cart' && count > 0 && (
+            <span className="absolute -right-4 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#0d0f14] text-xs font-bold text-white ring-1 ring-white/20">
+              {count}
+            </span>
+          )}
+          {l.active && (
+            <span className="absolute -bottom-1.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.9)]" />
+          )}
+        </Link>
+      ))}
+    </div>
+  )
+}
+
+export default function Navbar() {
   const router = useRouter()
   const [q, setQ] = useState('')
 
@@ -46,75 +93,16 @@ export default function Navbar() {
             />
           </div>
         </form>
-        <div className="flex items-center gap-4 sm:gap-5">
-          <Link
-            href="/"
-            className={`text-sm font-medium ${
-              pathname === '/'
-                ? 'text-neutral-900'
-                : 'text-neutral-500 hover:text-neutral-900'
-            }`}
-          >
-            Tienda
-          </Link>
-          <Link
-            href="/cartas"
-            className={`text-sm font-medium ${
-              pathname === '/cartas'
-                ? 'text-neutral-900'
-                : 'text-neutral-500 hover:text-neutral-900'
-            }`}
-          >
-            Cartas
-          </Link>
-          <Link
-            href="/?cat=accesorios"
-            className={`text-sm font-medium ${
-              pathname === '/'
-                ? 'text-neutral-900'
-                : 'text-neutral-500 hover:text-neutral-900'
-            }`}
-          >
-            Accesorios
-          </Link>
-          {isEnabled('wishlist') && (
-            <Link
-              href="/favoritos"
-              className={`text-sm font-medium ${
-                pathname === '/favoritos'
-                  ? 'text-neutral-900'
-                  : 'text-neutral-500 hover:text-neutral-900'
-              }`}
-            >
-              Favoritos
-            </Link>
-          )}
-          <Link
-            href="/cart"
-            className={`relative text-sm font-medium ${
-              pathname === '/cart'
-                ? 'text-neutral-900'
-                : 'text-neutral-500 hover:text-neutral-900'
-            }`}
-          >
-            Carrito
-            {count > 0 && (
-              <span className="absolute -right-4 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#0d0f14] text-xs font-bold text-white">
-                {count}
-              </span>
-            )}
-          </Link>
-          <Link
-            href="/account"
-            className={`text-sm font-medium ${
-              pathname === '/account'
-                ? 'text-neutral-900'
-                : 'text-neutral-500 hover:text-neutral-900'
-            }`}
-          >
-            Cuenta
-          </Link>
-        </div>
+        <Suspense
+          fallback={
+            <div className="flex items-center gap-4 sm:gap-5">
+              <span className="text-sm font-medium text-neutral-500">Tienda</span>
+              <span className="text-sm font-medium text-neutral-500">Cartas</span>
+            </div>
+          }
+        >
+          <NavLinks />
+        </Suspense>
       </nav>
       <form onSubmit={submit} className="px-4 pb-3 md:hidden">
         <input
