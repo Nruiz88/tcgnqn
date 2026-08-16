@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getProducts, getCategories, getGames } from '@/lib/data'
+import { formatPrice } from '@/lib/format'
 import type { Product } from '@/lib/types'
 import ProductCard from '@/components/product-card'
 import CardTile from '@/components/card-tile'
@@ -7,84 +8,6 @@ import { isCard } from '@/lib/cards'
 import { POKEMON_ERAS, findPokemonSet } from '@/lib/pokemon-sets'
 
 export const dynamic = 'force-dynamic'
-
-const features = [
-  {
-    title: 'Envío seguro',
-    desc: 'Protección rígida y seguimiento en todo el país.',
-    icon: 'truck',
-    tint: 'from-sky-500/15 to-sky-500/5 text-sky-400 ring-sky-500/25',
-    glow: 'group-hover:shadow-sky-500/25',
-  },
-  {
-    title: 'Cartas verificadas',
-    desc: 'Revisamos calidad y estado antes de enviar.',
-    icon: 'shield',
-    tint: 'from-emerald-500/15 to-emerald-500/5 text-emerald-400 ring-emerald-500/25',
-    glow: 'group-hover:shadow-emerald-500/25',
-  },
-  {
-    title: 'Pago coordinado',
-    desc: 'Arreglamos el pago por WhatsApp al confirmar.',
-    icon: 'chat',
-    tint: 'from-violet-500/15 to-violet-500/5 text-violet-400 ring-violet-500/25',
-    glow: 'group-hover:shadow-violet-500/25',
-  },
-  {
-    title: 'Colección curada',
-    desc: 'Solo productos que elegimos para tu binder.',
-    icon: 'star',
-    tint: 'from-amber-500/15 to-amber-500/5 text-amber-400 ring-amber-500/25',
-    glow: 'group-hover:shadow-amber-500/25',
-  },
-]
-
-function FeatureIcon({ name }: { name: string }) {
-  const common = {
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.8,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-  }
-  switch (name) {
-    case 'truck':
-      return (
-        <svg {...common} className="h-6 w-6">
-          <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-          <path d="M15 18h-5" />
-          <path d="M15 8h3.6a2 2 0 0 1 1.8 1.1l2.1 4A2 2 0 0 1 23 14v3a1 1 0 0 1-1 1h-1.5" />
-          <circle cx="7" cy="18" r="2" />
-          <circle cx="17" cy="18" r="2" />
-        </svg>
-      )
-    case 'shield':
-      return (
-        <svg {...common} className="h-6 w-6">
-          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-          <path d="m9 12 2 2 4-4" />
-        </svg>
-      )
-    case 'chat':
-      return (
-        <svg {...common} className="h-6 w-6">
-          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-          <path d="M8 12h.01" />
-          <path d="M12 12h.01" />
-          <path d="M16 12h.01" />
-        </svg>
-      )
-    case 'star':
-      return (
-        <svg {...common} className="h-6 w-6">
-          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
-        </svg>
-      )
-    default:
-      return null
-  }
-}
 
 function SectionHeader({
   kicker,
@@ -153,12 +76,9 @@ export default async function Home({
     markedFeatured.length > 0
       ? markedFeatured.slice(0, 8)
       : products.filter((p) => !isCard(p)).slice(0, 8)
-  // Recién llegados: solo productos normales, sin cartas individuales
-  const latest = allProducts
-    .filter((p) => !isCard(p))
-    .slice()
-    .reverse()
-    .slice(0, 4)
+  // Nuevos ingresos: los últimos cargados, sin cartas individuales
+  // (las cartas tienen su sección Singles más abajo)
+  const newArrivals = allProducts.filter((p) => !isCard(p)).slice(0, 10)
 
   // Accesorios: sección única en la home (solo cuando no hay filtros)
   const accesorios = allProducts.filter((p) => p.category?.slug === 'accesorios')
@@ -253,16 +173,6 @@ export default async function Home({
               </Link>
             </div>
 
-            <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3">
-              {features.map((f) => (
-                <span key={f.title} className="flex items-center gap-2 text-sm text-white/60">
-                  <svg className="h-4 w-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.6l7.3-7.3a1 1 0 0 1 1.4 0Z" clipRule="evenodd" />
-                  </svg>
-                  {f.title}
-                </span>
-              ))}
-            </div>
           </div>
 
           {/* Composición decorativa */}
@@ -305,33 +215,72 @@ export default async function Home({
         </div>
       </section>
 
-      {/* Features */}
-      <section className="border-b border-neutral-200 bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-4 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((f) => (
-            <div key={f.title} className="group relative">
-              <div
-                className={`relative h-full overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-b p-5 ring-1 ring-inset transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl dark:border-neutral-800/60 ${f.tint} ${f.glow}`}
-              >
-                <div
-                  className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 ${f.tint}`}
-                />
-                <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${f.tint} ring-1 ring-inset transition-transform duration-300 group-hover:scale-110`}
-                >
-                  <FeatureIcon name={f.icon} />
-                </div>
-                <p className="mt-4 font-display text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                  {f.title}
+      {/* Nuevos ingresos: ticker con los últimos productos cargados (estilo PokeArgentum) */}
+      {!activeGame && !activeCategory && newArrivals.length > 0 && (
+        <section className="border-b border-neutral-200 bg-surface">
+          <div className="mx-auto max-w-6xl px-4 py-12">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-indigo-500">
+                  Novedades
                 </p>
-                <p className="mt-1.5 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
-                  {f.desc}
+                <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                  Nuevos ingresos
+                </h2>
+                <p className="mt-2 text-sm text-neutral-500 sm:text-base">
+                  Lo último que llegó a la tienda
                 </p>
               </div>
+              <Link
+                href="/#productos"
+                className="hidden shrink-0 rounded-full border border-neutral-300 px-5 py-2 text-sm font-medium text-neutral-900 transition hover:border-neutral-900 hover:bg-[#171a21] hover:text-white sm:inline-block"
+              >
+                Ver todo →
+              </Link>
             </div>
-          ))}
-        </div>
-      </section>
+
+            <div className="ticker-wrap mt-8 block overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50/60 p-2 dark:border-neutral-800/60 dark:bg-neutral-900/40">
+              <div className="flex gap-3 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {newArrivals.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/product/${p.id}`}
+                    className="group flex w-60 shrink-0 snap-start items-center gap-3 rounded-xl border border-neutral-200 bg-surface p-2.5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-400/60 hover:shadow-md dark:border-neutral-700/50"
+                  >
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-neutral-100 ring-1 ring-inset ring-neutral-200 dark:bg-neutral-800/70 dark:ring-neutral-700/60">
+                      {p.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={p.image_url}
+                          alt={p.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-xl">
+                          {p.category?.emoji ?? '🛍️'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13px] font-semibold text-neutral-800 dark:text-neutral-100">
+                        {p.name}
+                      </p>
+                      <p className="mt-0.5 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                        {formatPrice(p.price)}
+                      </p>
+                      {p.stock > 0 && p.stock <= 3 && (
+                        <p className="mt-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                          ¡Últimas {p.stock}!
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Juegos TCG */}
       <section id="juegos" className="mx-auto max-w-6xl px-4 pt-8">
@@ -381,18 +330,9 @@ export default async function Home({
       </section>
 
       {/* Categorías */}
-      <section className="border-y border-neutral-200 bg-neutral-50">
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <SectionHeader
-            kicker="Categorías"
-            title="Explorá por categoría"
-            subtitle={
-              activeGame
-                ? `Categorías disponibles para ${activeGame.name}`
-                : 'Lo que tenemos hoy en la tienda'
-            }
-          />
-          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="border-y border-neutral-200 bg-neutral-50 dark:border-neutral-800/60 dark:bg-neutral-900/30">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {categories.map((c) => {
               const isActive = activeCategory?.slug === c.slug
               const isCartas = c.slug === 'cartas'
@@ -404,26 +344,48 @@ export default async function Home({
                 : isActive || (!activeGame && !isActive && !activeCategory)
                   ? `/?cat=${c.slug}`
                   : `/?${params.toString()}`
+              const count = allProducts.filter((p) => p.category?.slug === c.slug).length
               return (
                 <Link
                   key={c.id}
                   href={href}
-                  className={`group flex items-center justify-between rounded-3xl border p-6 transition hover:-translate-y-1 hover:shadow-lg ${
+                  className={`group relative flex flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                     isActive
-                      ? 'border-neutral-900 bg-[#0d0f14] text-white'
-                      : 'border-neutral-200 bg-surface'
+                      ? 'border-neutral-900 bg-[#0d0f14] text-white dark:border-neutral-700'
+                      : 'border-neutral-200 bg-surface hover:border-indigo-400/60'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <span className="text-2xl">{c.emoji}</span>
-                    <span className="text-sm font-semibold">{c.name}</span>
-                  </span>
+                  <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
                   <span
-                    className={`text-lg transition-transform group-hover:translate-x-1 ${
-                      isActive ? 'text-white' : 'text-neutral-300'
+                    className={`flex h-12 w-12 items-center justify-center rounded-2xl text-2xl shadow-sm ring-1 ring-inset transition-transform duration-300 group-hover:scale-110 ${
+                      isActive
+                        ? 'bg-white/10 ring-white/15'
+                        : 'bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 ring-neutral-200 dark:ring-neutral-700/60'
                     }`}
                   >
-                    →
+                    {c.emoji}
+                  </span>
+                  <span className="mt-4 font-display text-base font-bold tracking-tight">
+                    {c.name}
+                  </span>
+                  <span
+                    className={`mt-1 text-xs font-medium ${
+                      isActive ? 'text-white/70' : 'text-neutral-500 dark:text-neutral-400'
+                    }`}
+                  >
+                    {count > 0
+                      ? `${count} ${count === 1 ? 'producto' : 'productos'}`
+                      : 'Próximamente'}
+                  </span>
+                  <span
+                    className={`mt-4 inline-flex items-center gap-1 text-sm font-semibold transition-transform duration-300 group-hover:translate-x-1 ${
+                      isActive
+                        ? 'text-white'
+                        : 'text-indigo-600 dark:text-indigo-400'
+                    }`}
+                  >
+                    Ver
+                    <span aria-hidden>→</span>
                   </span>
                 </Link>
               )
@@ -462,27 +424,6 @@ export default async function Home({
           </div>
         )}
       </section>
-
-      {/* Novedades */}
-      {!activeGame && !activeCategory && latest.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-20">
-          <SectionHeader
-            kicker="Novedades"
-            title="Recién llegados"
-            subtitle="Lo último que sumamos a la tienda"
-            href="/#productos"
-          />
-          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {latest.map((product) =>
-              isCard(product) ? (
-                <CardTile key={product.id} product={product} />
-              ) : (
-                <ProductCard key={product.id} product={product} />
-              ),
-            )}
-          </div>
-        </section>
-      )}
 
       {/* Accesorios: sección única */}
       {!activeGame && !activeCategory && accesorios.length > 0 && (
