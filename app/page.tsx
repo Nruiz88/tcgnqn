@@ -9,6 +9,63 @@ import { POKEMON_ERAS, findPokemonSet } from '@/lib/pokemon-sets'
 
 export const dynamic = 'force-dynamic'
 
+const CATEGORY_STYLES: Record<
+  string,
+  {
+    accent: string
+    iconBox: string
+    badge: string
+    dot: string
+    link: string
+  }
+> = {
+  cartas: {
+    accent: 'from-indigo-500 to-violet-500',
+    iconBox:
+      'from-indigo-500/20 to-violet-500/10 text-indigo-400 ring-indigo-500/25 shadow-indigo-500/20',
+    badge:
+      'bg-indigo-500/10 text-indigo-600 ring-indigo-500/25 dark:text-indigo-400',
+    dot: 'bg-indigo-500',
+    link: 'text-indigo-600 dark:text-indigo-400',
+  },
+  boosters: {
+    accent: 'from-fuchsia-500 to-pink-500',
+    iconBox:
+      'from-fuchsia-500/20 to-pink-500/10 text-fuchsia-400 ring-fuchsia-500/25 shadow-fuchsia-500/20',
+    badge:
+      'bg-fuchsia-500/10 text-fuchsia-600 ring-fuchsia-500/25 dark:text-fuchsia-400',
+    dot: 'bg-fuchsia-500',
+    link: 'text-fuchsia-600 dark:text-fuchsia-400',
+  },
+  sleeves: {
+    accent: 'from-emerald-500 to-teal-500',
+    iconBox:
+      'from-emerald-500/20 to-teal-500/10 text-emerald-400 ring-emerald-500/25 shadow-emerald-500/20',
+    badge:
+      'bg-emerald-500/10 text-emerald-600 ring-emerald-500/25 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+    link: 'text-emerald-600 dark:text-emerald-400',
+  },
+  accesorios: {
+    accent: 'from-amber-500 to-orange-500',
+    iconBox:
+      'from-amber-500/20 to-orange-500/10 text-amber-400 ring-amber-500/25 shadow-amber-500/20',
+    badge:
+      'bg-amber-500/10 text-amber-600 ring-amber-500/25 dark:text-amber-400',
+    dot: 'bg-amber-500',
+    link: 'text-amber-600 dark:text-amber-400',
+  },
+  default: {
+    accent: 'from-neutral-400 to-neutral-500',
+    iconBox:
+      'from-neutral-500/20 to-neutral-600/10 text-neutral-400 ring-neutral-500/25 shadow-neutral-500/20',
+    badge:
+      'bg-neutral-500/10 text-neutral-600 ring-neutral-500/25 dark:text-neutral-400',
+    dot: 'bg-neutral-400',
+    link: 'text-neutral-600 dark:text-neutral-400',
+  },
+}
+
 function SectionHeader({
   kicker,
   title,
@@ -305,7 +362,8 @@ export default async function Home({
       </section>
 
       {/* Categorías */}
-      <section className="border-y border-neutral-200 bg-neutral-50 dark:border-neutral-800/60 dark:bg-neutral-900/30">
+      <section className="relative border-y border-neutral-200 bg-neutral-50 dark:border-neutral-800/60 dark:bg-neutral-900/30">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
         <div className="mx-auto max-w-6xl px-4 py-16">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {categories.map((c) => {
@@ -320,47 +378,61 @@ export default async function Home({
                   ? `/?cat=${c.slug}`
                   : `/?${params.toString()}`
               const count = allProducts.filter((p) => p.category?.slug === c.slug).length
+              const style =
+                CATEGORY_STYLES[c.slug] ?? CATEGORY_STYLES.default
               return (
                 <Link
                   key={c.id}
                   href={href}
-                  className={`group relative flex flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                  className={`group relative flex flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl ${
                     isActive
                       ? 'border-neutral-900 bg-[#0d0f14] text-white dark:border-neutral-700'
-                      : 'border-neutral-200 bg-surface hover:border-indigo-400/60'
+                      : 'border-neutral-200 bg-surface hover:border-neutral-300 dark:border-neutral-800/60 dark:hover:border-neutral-700'
                   }`}
                 >
-                  <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
+                  {/* Glow superior de color por categoría */}
+                  <div
+                    className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${style.accent}`}
+                  />
+                  <div
+                    className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${style.accent} opacity-[0.14] blur-2xl transition-opacity duration-300 group-hover:opacity-30`}
+                  />
+                  <div className="pointer-events-none absolute -bottom-16 -left-10 h-28 w-28 rounded-full bg-gradient-to-br from-neutral-500/10 to-transparent blur-2xl" />
+
                   <span
-                    className={`flex h-12 w-12 items-center justify-center rounded-2xl text-2xl shadow-sm ring-1 ring-inset transition-transform duration-300 group-hover:scale-110 ${
-                      isActive
-                        ? 'bg-white/10 ring-white/15'
-                        : 'bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 ring-neutral-200 dark:ring-neutral-700/60'
-                    }`}
+                    className={`relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br text-3xl shadow-lg ring-1 ring-inset transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3 ${style.iconBox}`}
                   >
                     {c.emoji}
                   </span>
-                  <span className="mt-4 font-display text-base font-bold tracking-tight">
+
+                  <span className="relative mt-5 font-display text-base font-bold tracking-tight">
                     {c.name}
                   </span>
+
                   <span
-                    className={`mt-1 text-xs font-medium ${
-                      isActive ? 'text-white/70' : 'text-neutral-500 dark:text-neutral-400'
+                    className={`relative mt-2.5 inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${
+                      count > 0 ? style.badge : 'bg-neutral-100 text-neutral-400 ring-neutral-200 dark:bg-neutral-800/60 dark:text-neutral-500 dark:ring-neutral-700/60'
                     }`}
                   >
-                    {count > 0
-                      ? `${count} ${count === 1 ? 'producto' : 'productos'}`
-                      : 'Próximamente'}
+                    {count > 0 ? (
+                      <>
+                        <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+                        {count} {count === 1 ? 'producto' : 'productos'}
+                      </>
+                    ) : (
+                      'Próximamente'
+                    )}
                   </span>
+
                   <span
-                    className={`mt-4 inline-flex items-center gap-1 text-sm font-semibold transition-transform duration-300 group-hover:translate-x-1 ${
-                      isActive
-                        ? 'text-white'
-                        : 'text-indigo-600 dark:text-indigo-400'
+                    className={`relative mt-auto flex items-center gap-1.5 pt-5 text-sm font-semibold transition-all duration-300 group-hover:gap-2.5 ${
+                      isActive ? 'text-white' : style.link
                     }`}
                   >
-                    Ver
-                    <span aria-hidden>→</span>
+                    Explorar
+                    <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5">
+                      →
+                    </span>
                   </span>
                 </Link>
               )
