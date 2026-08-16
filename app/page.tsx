@@ -126,39 +126,46 @@ export default async function Home({
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#0d0f14] text-white">
-        <div className="bg-grid pointer-events-none absolute inset-0" />
+        {/* Fondo: imagen panorámica + overlays para legibilidad */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-32 top-0 h-[30rem] w-[30rem] rounded-full bg-indigo-600/30 blur-3xl" />
-          <div className="absolute -bottom-40 -right-24 h-[30rem] w-[30rem] rounded-full bg-fuchsia-600/30 blur-3xl" />
-          <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/10 blur-3xl" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://s3.tcg.fans/optimized/users/0bd2c9aa-1bae-479b-8ea0-7b8e7c136684.webp"
+            alt=""
+            aria-hidden
+            className="h-full w-full object-cover object-center opacity-45"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0d0f14] via-[#0d0f14]/80 to-[#0d0f14]/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d0f14] via-transparent to-[#0d0f14]/60" />
         </div>
 
-        <div className="relative mx-auto grid max-w-6xl gap-14 px-4 py-24 sm:py-32 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-surface/5 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-              </span>
-              Tienda online de cartas TCG
+        <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-20">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-surface/5 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
             </span>
+            Tienda online de cartas TCG
+          </span>
 
-            <h1 className="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-              Cartas para cada{' '}
-              <span className="bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-amber-300 bg-clip-text text-transparent">
-                juego TCG
-              </span>
-            </h1>
+          <div className="mt-5 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+                Cartas para cada{' '}
+                <span className="bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-amber-300 bg-clip-text text-transparent">
+                  juego TCG
+                </span>
+              </h1>
+              <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base">
+                Singles, sobres y accesorios de Pokémon, Yu-Gi-Oh!, One Piece y
+                más. Elegí, dejá tu pedido y coordinamos el pago por WhatsApp.
+              </p>
+            </div>
 
-            <p className="mt-6 max-w-md text-base leading-relaxed text-white/70 sm:text-lg">
-              Singles, sobres y accesorios de Pokémon, Yu-Gi-Oh!, One Piece y
-              más. Elegí, dejá tu pedido y coordinamos el pago por WhatsApp.
-            </p>
-
-            <div className="mt-9 flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="#productos"
-                className="group rounded-full bg-surface px-7 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
+                className="group rounded-full bg-surface px-6 py-2.5 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
               >
                 Explorar catálogo{' '}
                 <span className="inline-block transition-transform group-hover:translate-x-1">
@@ -167,47 +174,35 @@ export default async function Home({
               </Link>
               <Link
                 href="#juegos"
-                className="rounded-full border border-white/20 bg-surface/5 px-7 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-surface/10"
+                className="rounded-full border border-white/20 bg-surface/5 px-6 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-surface/10"
               >
                 Ver juegos
               </Link>
             </div>
-
-          </div>
-
-          {/* Composición decorativa */}
-          <div className="relative hidden lg:block">
-            <div className="relative h-[26rem]">
-              <div className="absolute right-6 top-0 w-64 rotate-6 rounded-3xl border border-white/10 bg-gradient-to-br from-amber-400/25 to-yellow-600/10 p-6 shadow-2xl backdrop-blur transition hover:rotate-2">
-                <p className="text-4xl">⚡</p>
-                <p className="mt-4 font-display text-lg font-semibold">Pokémon TCG</p>
-                <p className="mt-1 text-xs text-white/60">Raros y chase cards</p>
-              </div>
-              <div className="absolute left-0 top-20 w-64 -rotate-6 rounded-3xl border border-white/10 bg-gradient-to-br from-purple-500/25 to-indigo-600/10 p-6 shadow-2xl backdrop-blur transition hover:-rotate-2">
-                <p className="text-4xl">🌀</p>
-                <p className="mt-4 font-display text-lg font-semibold">Yu-Gi-Oh!</p>
-                <p className="mt-1 text-xs text-white/60">Mazos y singles</p>
-              </div>
-              <div className="absolute bottom-0 right-24 w-64 rotate-2 rounded-3xl border border-white/10 bg-gradient-to-br from-sky-400/25 to-blue-600/10 p-6 shadow-2xl backdrop-blur transition hover:rotate-0">
-                <p className="text-4xl">🏴‍☠️</p>
-                <p className="mt-4 font-display text-lg font-semibold">One Piece</p>
-                <p className="mt-1 text-xs text-white/60">Booster packs</p>
-              </div>
-              <div className="absolute -bottom-4 left-16 rounded-2xl border border-white/10 bg-[#171a21]/90 px-5 py-3 shadow-xl backdrop-blur">
-                <p className="text-xs text-white/50">Nuevo en la tienda</p>
-                <p className="text-sm font-semibold">🫧 Lorcana · Tinta y glimmers</p>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Marquee */}
+        {/* Marquee: logos de los juegos TCG */}
         <div className="relative border-t border-white/10 bg-surface/5 py-4 backdrop-blur">
           <div className="flex overflow-hidden">
             <div className="animate-marquee flex shrink-0 items-center gap-12 pr-12">
               {[...games, ...games].map((g, i) => (
-                <span key={`${g.id}-${i}`} className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-white/50">
-                  <span>{g.emoji}</span> {g.name}
+                <span
+                  key={`${g.id}-${i}`}
+                  className="flex shrink-0 items-center gap-2.5 whitespace-nowrap"
+                >
+                  {g.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={g.image_url}
+                      alt={g.name}
+                      className="h-7 w-auto object-contain opacity-60 grayscale transition group-hover:opacity-100"
+                    />
+                  ) : (
+                    <span className="flex items-center gap-2 text-sm font-medium text-white/50">
+                      <span>{g.emoji}</span> {g.name}
+                    </span>
+                  )}
                 </span>
               ))}
             </div>
@@ -218,28 +213,8 @@ export default async function Home({
       {/* Nuevos ingresos: ticker con los últimos productos cargados (estilo PokeArgentum) */}
       {!activeGame && !activeCategory && newArrivals.length > 0 && (
         <section className="border-b border-neutral-200 bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-12">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-indigo-500">
-                  Novedades
-                </p>
-                <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-                  Nuevos ingresos
-                </h2>
-                <p className="mt-2 text-sm text-neutral-500 sm:text-base">
-                  Lo último que llegó a la tienda
-                </p>
-              </div>
-              <Link
-                href="/#productos"
-                className="hidden shrink-0 rounded-full border border-neutral-300 px-5 py-2 text-sm font-medium text-neutral-900 transition hover:border-neutral-900 hover:bg-[#171a21] hover:text-white sm:inline-block"
-              >
-                Ver todo →
-              </Link>
-            </div>
-
-            <div className="ticker-wrap mt-8 block overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50/60 p-2 dark:border-neutral-800/60 dark:bg-neutral-900/40">
+          <div className="mx-auto max-w-6xl px-4 py-10">
+            <div className="ticker-wrap block overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50/60 p-2 dark:border-neutral-800/60 dark:bg-neutral-900/40">
               <div className="flex gap-3 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {newArrivals.map((p) => (
                   <Link
