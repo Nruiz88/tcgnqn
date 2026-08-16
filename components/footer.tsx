@@ -5,30 +5,34 @@ import { isEnabled } from '@/lib/modules'
 import { buildWhatsappLink, whatsappNumber } from '@/lib/whatsapp'
 import type { SocialKey } from '@/lib/types'
 
-const headCls = 'text-xs font-semibold uppercase tracking-widest text-neutral-400'
+const headCls = 'text-[11px] font-semibold uppercase tracking-widest text-neutral-500'
 const linkCls =
-  'group inline-flex items-center gap-1 text-sm text-neutral-500 transition hover:text-neutral-900'
+  'group inline-flex items-center gap-1 text-sm text-neutral-500 transition hover:text-white'
 
 const trust = [
   {
     icon: '🚚',
     title: 'Envíos protegidos',
     desc: 'Toploaders y sobres acolchados',
+    box: 'from-indigo-500/25 to-violet-500/10 ring-indigo-500/30 shadow-indigo-500/20',
   },
   {
     icon: '💬',
     title: 'Pago coordinado',
     desc: 'WhatsApp o transferencia',
+    box: 'from-violet-500/25 to-fuchsia-500/10 ring-violet-500/30 shadow-violet-500/20',
   },
   {
     icon: '✅',
     title: 'Cartas originales',
     desc: 'Verificadas una por una',
+    box: 'from-emerald-500/25 to-teal-500/10 ring-emerald-500/30 shadow-emerald-500/20',
   },
   {
     icon: '🛡️',
     title: 'Cambios en 48 hs',
     desc: 'Si algo no te convence',
+    box: 'from-amber-500/25 to-orange-500/10 ring-amber-500/30 shadow-amber-500/20',
   },
 ]
 
@@ -132,24 +136,30 @@ export default async function Footer() {
   const methods = ['Efectivo', 'Transferencia', 'WhatsApp']
 
   return (
-    <footer className="relative border-t border-neutral-200 bg-surface">
-      <div className="h-1 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-500" />
+    <footer className="relative overflow-hidden border-t border-white/10 bg-[#0d0f14] text-white">
+      {/* Glow decorativo superior */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(55%_100%_at_50%_0%,rgba(99,102,241,0.14),transparent)]" />
+      <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
 
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-6 border-b border-neutral-100 py-10 sm:grid-cols-4">
+      <div className="relative mx-auto max-w-6xl px-4">
+        {/* Confianza */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-6 border-b border-white/10 py-10 sm:grid-cols-4">
           {trust.map((t) => (
-            <div key={t.title} className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-lg">
+            <div key={t.title} className="group flex items-start gap-3">
+              <span
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-lg shadow-lg ring-1 ring-inset transition-transform duration-300 group-hover:scale-110 ${t.box}`}
+              >
                 {t.icon}
               </span>
               <div>
-                <p className="text-sm font-semibold">{t.title}</p>
+                <p className="text-sm font-semibold text-white">{t.title}</p>
                 <p className="mt-0.5 text-xs text-neutral-500">{t.desc}</p>
               </div>
             </div>
           ))}
         </div>
 
+        {/* Columnas */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-12 sm:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
@@ -158,9 +168,9 @@ export default async function Footer() {
                 alt="TCG NQN"
                 width={40}
                 height={40}
-                className="h-10 w-10 rounded-full object-cover"
+                className="h-10 w-10 rounded-full object-cover ring-1 ring-white/20"
               />
-              <span className="font-display text-xl font-bold tracking-tight">
+              <span className="font-display text-xl font-bold tracking-tight text-white">
                 TCG NQN
               </span>
             </Link>
@@ -172,7 +182,7 @@ export default async function Footer() {
             <div className="mt-6 flex flex-wrap gap-2.5">
               <Link
                 href="/contacto"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0d0f14] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-400 hover:to-fuchsia-400"
               >
                 ¿Buscás una carta puntual?
               </Link>
@@ -181,9 +191,9 @@ export default async function Footer() {
                   href={wa}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-neutral-300 px-5 py-2.5 text-sm font-semibold transition hover:bg-neutral-100"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/5"
                 >
-                  <span className="text-green-500">WhatsApp</span>
+                  <span className="text-green-400">WhatsApp</span>
                 </a>
               )}
             </div>
@@ -255,7 +265,7 @@ export default async function Footer() {
                     href={wa}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium text-indigo-600 hover:underline"
+                    className="text-sm font-medium text-indigo-400 hover:text-indigo-300 hover:underline"
                   >
                     +549 WhatsApp
                   </a>
@@ -272,7 +282,7 @@ export default async function Footer() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={s.label}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200 text-neutral-500 transition hover:border-neutral-400 hover:text-neutral-900"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-neutral-500 transition hover:border-white/40 hover:text-white"
                       >
                         {s.icon}
                       </a>
@@ -284,17 +294,18 @@ export default async function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-neutral-100 py-6 sm:flex-row">
-          <p className="text-xs text-neutral-400">
+        {/* Barra inferior */}
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 sm:flex-row">
+          <p className="text-xs text-neutral-500">
             © {new Date().getFullYear()} TCG NQN · Neuquén, Argentina · Todos los
             derechos reservados
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <span className="text-xs text-neutral-400">Medios de pago:</span>
+            <span className="text-xs text-neutral-500">Medios de pago:</span>
             {methods.map((m) => (
               <span
                 key={m}
-                className="rounded-full border border-neutral-200 px-3 py-1 text-[11px] font-medium text-neutral-500"
+                className="rounded-full border border-white/10 px-3 py-1 text-[11px] font-medium text-neutral-500"
               >
                 {m}
               </span>

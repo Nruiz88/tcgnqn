@@ -294,7 +294,7 @@ export default async function Home({
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-semibold text-neutral-800 dark:text-neutral-100">
+                      <p className="truncate text-[13px] font-semibold text-neutral-800">
                         {p.name}
                       </p>
                       <p className="mt-0.5 text-sm font-bold text-indigo-600 dark:text-indigo-400">

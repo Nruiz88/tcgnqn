@@ -113,7 +113,7 @@ export default function AdminGuiaPage() {
           <a
             key={s.href}
             href={s.href}
-            className="rounded-full border border-neutral-200 bg-surface px-3.5 py-1.5 text-xs font-medium text-neutral-600 transition hover:border-indigo-400/60 hover:text-indigo-600 dark:border-neutral-800/60 dark:text-neutral-400 dark:hover:text-indigo-400"
+            className="rounded-full border border-neutral-200 bg-surface px-3.5 py-1.5 text-xs font-medium text-neutral-600 transition hover:border-indigo-400/60 hover:text-indigo-600 dark:border-neutral-800/60 dark:text-neutral-500 dark:hover:text-indigo-400"
           >
             {s.label}
           </a>
@@ -135,8 +135,8 @@ export default function AdminGuiaPage() {
                 Sobres, cajas, sleeves, protectores y cualquier ítem que se
                 vende por unidad. Se cargan con categoría y juego (opcional).
               </p>
-              <p className="mt-3 text-xs text-neutral-400">
-                Panel → <b className="text-neutral-600 dark:text-neutral-300">Productos</b>
+              <p className="mt-3 text-xs text-neutral-500">
+                Panel → <b className="text-neutral-700">Productos</b>
               </p>
             </Card>
             <Card>
@@ -150,8 +150,8 @@ export default function AdminGuiaPage() {
                 Singles TCG con datos extra: set/expansión, condición, idioma y
                 rareza. Se agrupan solas por colección en la home.
               </p>
-              <p className="mt-3 text-xs text-neutral-400">
-                Panel → <b className="text-neutral-600 dark:text-neutral-300">Cartas</b>
+              <p className="mt-3 text-xs text-neutral-500">
+                Panel → <b className="text-neutral-700">Cartas</b>
               </p>
             </Card>
             <Card>
@@ -165,8 +165,8 @@ export default function AdminGuiaPage() {
                 Productos de la categoría Accesorios (binders, decks, fundas…).
                 Tienen su propia sección en el panel y en la home.
               </p>
-              <p className="mt-3 text-xs text-neutral-400">
-                Panel → <b className="text-neutral-600 dark:text-neutral-300">Accesorios</b>
+              <p className="mt-3 text-xs text-neutral-500">
+                Panel → <b className="text-neutral-700">Accesorios</b>
               </p>
             </Card>
           </div>
@@ -177,21 +177,21 @@ export default function AdminGuiaPage() {
                 <li className="flex gap-2">
                   <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                   <span>
-                    <b className="text-neutral-700 dark:text-neutral-200">Carta suelta</b>{' '}
+                    <b className="text-neutral-800">Carta suelta</b>{' '}
                     (una sola carta de un juego) → <b>Carta individual</b>.
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                   <span>
-                    <b className="text-neutral-700 dark:text-neutral-200">Binder, toploader, sleeves, deckbox</b>{' '}
+                    <b className="text-neutral-800">Binder, toploader, sleeves, deckbox</b>{' '}
                     → <b>Accesorio</b>.
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                   <span>
-                    <b className="text-neutral-700 dark:text-neutral-200">Todo lo demás</b>{' '}
+                    <b className="text-neutral-800">Todo lo demás</b>{' '}
                     (boosters, cajas, colecciones selladas, merchandising) →{' '}
                     <b>Producto</b>.
                   </span>
@@ -208,35 +208,35 @@ export default function AdminGuiaPage() {
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">1</span>
                 <span>
-                  Andá a <b className="text-neutral-700 dark:text-neutral-200">Productos → Nuevo producto</b>{' '}
+                  Andá a <b className="text-neutral-800">Productos → Nuevo producto</b>{' '}
                   (o <b>Accesorios → Nuevo accesorio</b> si es de esa categoría).
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">2</span>
                 <span>
-                  Completá <b className="text-neutral-700 dark:text-neutral-200">nombre, precio y stock</b>.
+                  Completá <b className="text-neutral-800">nombre, precio y stock</b>.
                   La descripción es opcional pero recomendada.
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">3</span>
                 <span>
-                  Pegá la <b className="text-neutral-700 dark:text-neutral-200">URL de la imagen</b> (o subí
+                  Pegá la <b className="text-neutral-800">URL de la imagen</b> (o subí
                   el archivo en el caso de los juegos).
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">4</span>
                 <span>
-                  Elegí <b className="text-neutral-700 dark:text-neutral-200">categoría y juego</b>. La
+                  Elegí <b className="text-neutral-800">categoría y juego</b>. La
                   categoría define en qué sección aparece; el juego es opcional.
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">5</span>
                 <span>
-                  Guardá. El producto queda <b className="text-neutral-700 dark:text-neutral-200">publicado</b>{' '}
+                  Guardá. El producto queda <b className="text-neutral-800">publicado</b>{' '}
                   y aparece en la web al instante.
                 </span>
               </li>
@@ -251,14 +251,14 @@ export default function AdminGuiaPage() {
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">1</span>
                 <span>
-                  Andá a <b className="text-neutral-700 dark:text-neutral-200">Cartas → Nueva carta</b>.
+                  Andá a <b className="text-neutral-800">Cartas → Nueva carta</b>.
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">2</span>
                 <span>
-                  Nombre, <b className="text-neutral-700 dark:text-neutral-200">juego</b> y{' '}
-                  <b className="text-neutral-700 dark:text-neutral-200">set/expansión</b>{' '}
+                  Nombre, <b className="text-neutral-800">juego</b> y{' '}
+                  <b className="text-neutral-800">set/expansión</b>{' '}
                   (el campo tiene autocompletado con todos los sets Pokémon).
                 </span>
               </li>
@@ -300,7 +300,7 @@ export default function AdminGuiaPage() {
                   <Pill color="bg-amber-500/10 text-amber-600 ring-amber-500/20 dark:text-amber-400">1–3 · ¡Últimas X!</Pill>
                   <Pill color="bg-emerald-500/10 text-emerald-600 ring-emerald-500/20 dark:text-emerald-400">4+ · X disponibles</Pill>
                 </div>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-neutral-500">
                   Con stock 0 el botón de compra queda deshabilitado con «Sin stock».
                 </p>
               </div>
@@ -313,7 +313,7 @@ export default function AdminGuiaPage() {
                   categoría. Las imágenes de los juegos (logos) se usan en la cinta
                   del hero, la sección «Elegí tu juego» y el footer.
                 </p>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-neutral-500">
                   Consejo: imágenes cuadradas o de carta 5:7 se ven mejor.
                 </p>
               </div>
@@ -323,12 +323,12 @@ export default function AdminGuiaPage() {
               <div className="mt-3 space-y-2">
                 <p className="text-sm text-neutral-500">
                   Define la sección donde vive el producto. Hoy existen:{' '}
-                  <b className="text-neutral-700 dark:text-neutral-200">Cartas individuales</b>,{' '}
-                  <b className="text-neutral-700 dark:text-neutral-200">Sobres y Boosters</b>,{' '}
-                  <b className="text-neutral-700 dark:text-neutral-200">Sleeves y Protectores</b> y{' '}
-                  <b className="text-neutral-700 dark:text-neutral-200">Accesorios</b>.
+                  <b className="text-neutral-800">Cartas individuales</b>,{' '}
+                  <b className="text-neutral-800">Sobres y Boosters</b>,{' '}
+                  <b className="text-neutral-800">Sleeves y Protectores</b> y{' '}
+                  <b className="text-neutral-800">Accesorios</b>.
                 </p>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-neutral-500">
                   Se gestionan en <b>Panel → Categorías</b>.
                 </p>
               </div>
@@ -341,7 +341,7 @@ export default function AdminGuiaPage() {
                   Se usa para filtrar en <b>/cartas?game=…</b> y para armar las
                   tarjetas de juegos de la home.
                 </p>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-neutral-500">
                   Los juegos se gestionan en <b>Panel → Juegos</b> (con logo y color).
                 </p>
               </div>
@@ -438,7 +438,7 @@ export default function AdminGuiaPage() {
           <Card>
             <div className="space-y-3 text-sm text-neutral-500">
               <p>
-                Los pedidos llegan a <b className="text-neutral-700 dark:text-neutral-200">Panel → Pedidos</b>{' '}
+                Los pedidos llegan a <b className="text-neutral-800">Panel → Pedidos</b>{' '}
                 cuando un cliente completa el checkout. Cada pedido muestra los
                 ítems, el total, el envío y el estado.
               </p>
@@ -460,12 +460,12 @@ export default function AdminGuiaPage() {
           <Card>
             <div className="space-y-3 text-sm text-neutral-500">
               <p>
-                En <b className="text-neutral-700 dark:text-neutral-200">Panel → Configuración</b> se
+                En <b className="text-neutral-800">Panel → Configuración</b> se
                 gestionan las redes sociales del footer, Mercado Pago (pago
                 online), las credenciales de Correo Argentino (envíos con guía) y
                 las notificaciones de WhatsApp.
               </p>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-neutral-500">
                 Tip: probá la tienda con un producto de cada categoría para ver
                 cómo se arma cada sección de la home.
               </p>

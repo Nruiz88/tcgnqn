@@ -41,7 +41,7 @@ function Breadcrumb({ product }: { product: NonNullable<Awaited<ReturnType<typeo
       aria-label="Miga de pan"
       className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-neutral-500"
     >
-      <Link href="/" className="transition hover:text-neutral-900 dark:hover:text-neutral-100">
+      <Link href="/" className="transition hover:text-neutral-900 dark:hover:text-white">
         Inicio
       </Link>
       {product.game?.name && (
@@ -53,7 +53,7 @@ function Breadcrumb({ product }: { product: NonNullable<Awaited<ReturnType<typeo
                 ? `/cartas?game=${product.game.slug}`
                 : `/?game=${product.game.slug}`
             }
-            className="transition hover:text-neutral-900 dark:hover:text-neutral-100"
+            className="transition hover:text-neutral-900 dark:hover:text-white"
           >
             {product.game.name}
           </Link>
@@ -64,14 +64,14 @@ function Breadcrumb({ product }: { product: NonNullable<Awaited<ReturnType<typeo
           <span aria-hidden>/</span>
           <Link
             href={`/cartas?set=${encodeURIComponent(product.set_name.trim().toLowerCase())}`}
-            className="transition hover:text-neutral-900 dark:hover:text-neutral-100"
+            className="transition hover:text-neutral-900 dark:hover:text-white"
           >
             {product.set_name}
           </Link>
         </>
       )}
       <span aria-hidden>/</span>
-      <span className="truncate font-medium text-neutral-900 dark:text-neutral-100">
+      <span className="truncate font-medium text-neutral-900">
         {product.name}
       </span>
     </nav>
