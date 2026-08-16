@@ -43,6 +43,10 @@ function groups(): NavGroup[] {
     label: 'Configuración',
     items: [{ href: '/admin/settings', label: 'Configuración', icon: 'share' }],
   })
+  nav.push({
+    label: 'Ayuda',
+    items: [{ href: '/admin/guia', label: 'Guía', icon: 'sparkles' }],
+  })
   return nav
 }
 

@@ -17,6 +17,7 @@ const LABELS: [RegExp, string][] = [
   [/^\/admin\/games/, 'Juegos'],
   [/^\/admin\/coupons/, 'Cupones'],
   [/^\/admin\/settings/, 'Configuración'],
+  [/^\/admin\/guia/, 'Guía'],
   [/^\/admin/, 'Productos'],
 ]
 
