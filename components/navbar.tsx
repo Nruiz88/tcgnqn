@@ -85,9 +85,9 @@ function NavLinks({ vertical = false }: { vertical?: boolean }) {
           } ${
             l.active
               ? vertical
-                ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                : 'text-neutral-900 dark:text-neutral-100'
-              : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100'
+                ? 'bg-indigo-500/10 text-white'
+                : 'text-white'
+              : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
           }`}
         >
           {vertical && l.active && (
